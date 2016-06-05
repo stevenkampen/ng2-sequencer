@@ -2,6 +2,8 @@ import { RioAlert } from './alert';
 import { RioButton } from './button';
 import { RioContainer } from './container';
 import { RioCounter } from './counter';
+import { PlayControls } from './sequencer/play-controls';
+import { ChannelCanvas } from './sequencer/channel-canvas';
 import { RioLogo } from './logo';
 import { RioLoginModal, RioLoginForm } from './login';
 import { RioNavigator, RioNavigatorItem } from './navigator';
@@ -30,5 +32,7 @@ export {
   RioModal,
   RioModalContent,
   RioNavigator,
-  RioNavigatorItem
+  RioNavigatorItem,
+  PlayControls,
+  ChannelCanvas,
 };

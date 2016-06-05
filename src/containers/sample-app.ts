@@ -9,6 +9,7 @@ import { IAppState } from '../reducers';
 import { ISession } from '../reducers/session';
 import { SessionActions } from '../actions/session';
 import { RioAboutPage } from './about-page';
+import { SequencerPage } from './sequencer-page';
 import { RioCounterPage } from './counter-page';
 import rootReducer from '../reducers';
 import { middleware, enhancers } from '../store';
@@ -35,10 +36,15 @@ import {
 })
 @RouteConfig([
   {
+    path: '/sequencer',
+    name: 'Sequencer',
+    component: SequencerPage,
+    useAsDefault: true
+  },
+  {
     path: '/counter',
     name: 'Counter',
-    component: RioCounterPage,
-    useAsDefault: true
+    component: RioCounterPage
   },
   {
     path: '/about',
