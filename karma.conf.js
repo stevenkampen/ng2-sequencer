@@ -30,6 +30,9 @@ module.exports = (config) => {
       verbose: true,
       resolve: {
         extensions: ['', '.webpack.js', '.web.js', '.ts', '.js'],
+        alias: {
+          'p5sound': 'p5/lib/addons/p5.sound.js',
+        },
       },
       module: {
         loaders: [

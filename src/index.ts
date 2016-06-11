@@ -17,6 +17,7 @@ import { SessionActions } from './actions/session';
 import { CounterActions } from './actions/counter';
 import { AuthService } from './services/auth/';
 import { ServerService } from './services/server/';
+import { SoundService } from './services/sound/';
 
 declare let __PRODUCTION__: any;
 
@@ -30,6 +31,7 @@ bootstrap(RioSampleApp, [
   NgRedux,
   SessionActions,
   CounterActions,
+  SoundService,
   AuthService,
   ServerService,
   HTTP_PROVIDERS,
