@@ -89,6 +89,9 @@ module.exports = {
 
   resolve: {
     extensions: ['', '.webpack.js', '.web.js', '.ts', '.js'],
+    alias: {
+      'p5sound': 'p5/lib/addons/p5.sound.js',
+    },
   },
 
   plugins: plugins,
