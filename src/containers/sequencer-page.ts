@@ -8,12 +8,13 @@ import {
   RioContainer,
   PlayControls,
   ChannelCanvas,
+  Keyboard,
 } from '../components';
 
 @Component({
   selector: 'sequencer-page',
   providers: [ SequencerActions ],
-  directives: [RioContainer, PlayControls, ChannelCanvas],
+  directives: [RioContainer, PlayControls, ChannelCanvas, Keyboard],
   pipes: [ AsyncPipe ],
   template: `
     <rio-container [size]=2 [center]=true>
@@ -31,6 +32,8 @@ import {
         [channelCount]="channelCount$ | async"
         [playMidiNote]="actions.playMidiNote.bind(actions)">
       </channel-canvas>
+      <keyboard [playMidiNote]="actions.playMidiNote.bind(actions)">
+      </keyboard>
     </rio-container>
   `
 })

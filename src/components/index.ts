@@ -3,6 +3,7 @@ import { RioButton } from './button';
 import { RioContainer } from './container';
 import { RioCounter } from './counter';
 import { PlayControls } from './sequencer/play-controls';
+import { Keyboard } from './sequencer/keyboard';
 import { ChannelCanvas } from './sequencer/channel-canvas';
 import { RioLogo } from './logo';
 import { RioLoginModal, RioLoginForm } from './login';
@@ -35,4 +36,5 @@ export {
   RioNavigatorItem,
   PlayControls,
   ChannelCanvas,
+  Keyboard,
 };
