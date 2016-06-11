@@ -25,9 +25,11 @@ import {
         [toggleLooping]="actions.toggleLooping.bind(actions)">
       </play-controls>
       <channel-canvas
-        [data]="data$ | async"
+        [sequenceData]="sequenceData$ | async"
+        [soundData]="soundData$ | async"
         [measureCount]="measureCount$ | async"
-        [channelCount]="channelCount$ | async">
+        [channelCount]="channelCount$ | async"
+        [playMidiNote]="actions.playMidiNote.bind(actions)">
       </channel-canvas>
     </rio-container>
   `
@@ -37,12 +39,15 @@ export class SequencerPage {
 
   @select(n => n.sequencer.get('playing'))
   private playing$: Observable<boolean>;
-  
+
   @select(n => n.sequencer.get('looping'))
   private looping$: Observable<boolean>;
-  
-  @select(n => n.sequencer.get('data'))
-  private data$: Observable<boolean>;
+
+  @select(n => n.sequencer.get('sequenceData'))
+  private sequenceData$: Observable<boolean>;
+
+  @select(n => n.sequencer.get('soundData'))
+  private soundData$: Observable<boolean>;
 
   @select(n => n.sequencer.get('measureCount'))
   private measureCount$: Observable<boolean>;

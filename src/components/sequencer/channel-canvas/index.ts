@@ -5,17 +5,21 @@ import {
 } from '@angular/core';
 
 import { RioButton } from '../../button';
+import { Map } from 'immutable';
+
 
 @Component({
   selector: 'channel-canvas',
   template: `
-    <div class="flex">
-      <div *ngFor="let measure of data" style="width:33%;background:#333;">
-        <div *ngFor="let channelSegment of measure">
-          <div *ngFor="let note of channelSegment" 
-            style="width:25%;float:left;border-bottom:1px solid white;
-              border-left:1px solid white;text-align:center;color:white;">
-            {{ note }}
+    <div>
+      <div *ngFor="let channel of sequenceData" style="background:#333;" 
+        class="flex">
+        <div *ngFor="let measure of channel" style="width:33.3%;">
+          <div *ngFor="let soundId of measure"
+            (click)="soundId ? handleNoteClick(soundId) : null"
+            style="border-bottom:1px solid white;float:left;width:25%;
+            border-left:1px solid white;text-align:center;color:white;">
+            {{ soundId || '__' }}
           </div>
         </div>
       </div>
@@ -28,8 +32,19 @@ import { RioButton } from '../../button';
 export class ChannelCanvas {
   @Input() channelCount: number = 0;
   @Input() measureCount: number = 0;
-  @Input() data: Array<Array<number>> = [];
+  @Input() sequenceData: Array<Array<number>> = [];
+  @Input() soundData: Map<string, number>;
+  @Input() playMidiNote: (number) => void;
 
   constructor() {
   }
+
+  handleNoteClick = (soundId) => {
+    const [octave, note] = soundId.split('_');
+    console.log('=========\noctave:', octave);
+    console.log('note:', note);
+    const midiNote = (octave * 12) + this.soundData.get(note);
+    console.log('midiNote', midiNote, '\n=========');
+    this.playMidiNote(midiNote);
+  };
 };

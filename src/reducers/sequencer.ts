@@ -8,48 +8,63 @@ const INITIAL_STATE = fromJS({
   channelCount: 2, // independently configurable/customizable channels
   // tempo: 120, // bpm
   measureCount: 3, // number of bars
-  data: [
-    [ // measure 1
-      [
-        1,
-        2,
-        3,
-        4,
-      ], // channel 1
-      [
-        0,
-        0,
-        1,
-        2,
-      ], // channel 2
+  soundData: {
+    // 12 notes - [C, C#, D, D#, E, F, F#, G, G#, A, A#, B]
+    // 11 Octaves
+    // 12 * octave + scaleIndex
+    'C': 0,
+    'C#': 1,
+    'D': 2,
+    'D#': 3,
+    'E': 4,
+    'F': 5,
+    'F#': 6,
+    'G': 7,
+    'G#': 8,
+    'A': 9,
+    'A#': 10,
+    'B': 11,
+  },
+  sequenceData: [
+    [ // channel 1
+      [ // channel 1 - measure 1
+        '7_G',
+        '7_E',
+        '5_F',
+        '5_F',
+      ],
+      [ // channel 1 - measure 2
+        '9_A#',
+        '9_B',
+        '6_A',
+        '6_B',
+      ],
+      [ // channel 1 - measure 3
+        '9_A#',
+        '10_B',
+        '4_A',
+        '4_B',
+      ],
     ],
-    [ // measure 2
-      [
-        1,
-        2,
-        3,
-        4,
-      ], // channel 1
-      [
-        0,
-        0,
-        0,
-        0,
-      ], // channel 2
-    ],
-    [  // measure 3
-      [
-        1,
-        2,
-        3,
-        4,
-      ], // channel 1
-      [
-        0,
-        0,
-        1,
-        2,
-      ], // channel 2
+    [ // channel 2
+      [ // channel 2 - measure 1
+        null,
+        '4_E',
+        null,
+        '4_F#',
+      ],
+      [ // channel 2 - measure 2
+        '4_C',
+        null,
+        '4_C#',
+        null,
+      ],
+      [ // channel 2 - measure 3
+        '4_C#',
+        '3_C#',
+        '4_C#',
+        '3_C#',
+      ],
     ],
   ],
 });

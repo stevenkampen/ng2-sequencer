@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { NgRedux } from 'ng2-redux';
 import { IAppState } from '../reducers';
+import { SoundService } from '../services/sound';
 
 @Injectable()
 export class SequencerActions {
@@ -12,10 +13,15 @@ export class SequencerActions {
   static REMOVE_CHANNEL = 'REMOVE_CHANNEL';
   static TOGGLE_LOOPING = 'TOGGLE_LOOPING';
 
-  constructor(private ngRedux: NgRedux<IAppState>) {}
+  constructor(private ngRedux: NgRedux<IAppState>,
+              private soundService: SoundService) {}
 
   play() {
     this.ngRedux.dispatch({ type: SequencerActions.PLAY });
+  }
+
+  playMidiNote(note: number) {
+    this.soundService.playNote(note);
   }
 
   pause() {
