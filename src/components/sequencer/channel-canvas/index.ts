@@ -41,10 +41,7 @@ export class ChannelCanvas {
 
   handleNoteClick = (soundId) => {
     const [octave, note] = soundId.split('_');
-    console.log('=========\noctave:', octave);
-    console.log('note:', note);
     const midiNote = (octave * 12) + this.soundData.get(note);
-    console.log('midiNote', midiNote, '\n=========');
     this.playMidiNote(midiNote);
   };
 };

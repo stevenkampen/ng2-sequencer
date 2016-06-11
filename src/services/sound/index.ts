@@ -22,14 +22,14 @@ export class SoundService {
   }
 
   public playNote(note: number) {
-    //, envelopeOptions: Array<number> = 
+    // , envelopeOptions: Array<number> = 
     //    [ 0.010, 1.000, 0.000, 1.000, 0.000, 1.000, 0.500 ]) {
 
     const osc = new p5.SinOsc();
     osc.amp(0);
     osc.start();
     const freq = this.p5.midiToFreq(note);
-    console.log('freq:', freq);
+    // console.log('freq:', freq);
     osc.freq(freq);
     osc.amp(0.5, 0.05);
     setTimeout(() => osc.amp(0, 0.2), 100);
