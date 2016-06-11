@@ -17,7 +17,7 @@ import {
   directives: [RioContainer, PlayControls, ChannelCanvas, Keyboard],
   pipes: [ AsyncPipe ],
   template: `
-    <rio-container [size]=2 [center]=true>
+    <rio-container [size]=4 [center]=true>
       <play-controls
       [playing]="playing$ | async"
         [looping]="looping$ | async"
