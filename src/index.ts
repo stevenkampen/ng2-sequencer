@@ -21,6 +21,8 @@ import { SoundService } from './services/sound/';
 
 declare let __PRODUCTION__: any;
 
+require('style!css!font-awesome/css/font-awesome.css');
+
 if (__PRODUCTION__) {
   enableProdMode();
 } else {

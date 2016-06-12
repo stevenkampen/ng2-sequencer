@@ -106,14 +106,30 @@ module.exports = {
       loaders.tslint,
     ],
     loaders: [
+      {
+        test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&mimetype=application/font-woff',
+      }, {
+        test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&mimetype=application/font-woff',
+      }, {
+        test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&mimetype=application/octet-stream',
+      }, {
+        test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'file',
+      }, {
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&mimetype=image/svg+xml',
+      },
       loaders.ts,
       loaders.html,
       loaders.css,
       loaders.svg,
-      loaders.eot,
-      loaders.woff,
-      loaders.woff2,
-      loaders.ttf,
+      // loaders.eot,
+      // loaders.woff,
+      // loaders.woff2,
+      // loaders.ttf,
     ],
     noParse: [ /zone\.js\/dist\/.+/, /angular2\/bundles\/.+/ ],
   },

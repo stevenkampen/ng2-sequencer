@@ -1,21 +1,33 @@
 import { Component, Input } from '@angular/core';
 import { RioButton } from '../../button';
-import { ChangeDetectionStrategy } from '@angular/core';
+import {
+  ViewEncapsulation,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 @Component({
   selector: 'play-controls',
   template: `
-    <div class="flex">
+    <div class="flex control-bar">
       <rio-button (click)="!playing ? play() : pause()">
-        <template [ngIf]="playing">Pause</template>
-        <template [ngIf]="!playing">Play</template>
+        <i class="fa"
+          [ngClass]="{'fa-pause': playing, 'fa-play': !playing }">
+        </i>
       </rio-button>
       <rio-button (click)="toggleLooping()">
-        <template [ngIf]="looping">Disable Looping</template>
-        <template [ngIf]="!looping">Enable Looping</template>
+        <i class="fa fa-repeat"
+          [ngClass]="{'fa-spin': looping }">
+        </i>
       </rio-button>
     </div>
   `,
+  encapsulation: ViewEncapsulation.Emulated,
+  styles: [`
+    .control-bar {
+      padding: .5em;
+    }
+    rio-button { margin-right: .3em; }
+  `],
   directives: [RioButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
