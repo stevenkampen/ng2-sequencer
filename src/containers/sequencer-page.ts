@@ -7,14 +7,14 @@ import { Observable } from 'rxjs/Observable';
 import { 
   RioContainer,
   PlayControls,
-  ChannelCanvas,
+  SequenceCanvas,
   Keyboard,
 } from '../components';
 
 @Component({
   selector: 'sequencer-page',
   providers: [ SequencerActions ],
-  directives: [RioContainer, PlayControls, ChannelCanvas, Keyboard],
+  directives: [RioContainer, PlayControls, SequenceCanvas, Keyboard],
   pipes: [ AsyncPipe ],
   template: `
     <rio-container [size]=4 [center]=true>
@@ -25,13 +25,13 @@ import {
         [pause]="actions.pause.bind(actions)"
         [toggleLooping]="actions.toggleLooping.bind(actions)">
       </play-controls>
-      <channel-canvas
+      <sequence-canvas
         [sequenceData]="sequenceData$ | async"
         [soundData]="soundData$ | async"
         [measureCount]="measureCount$ | async"
         [channelCount]="channelCount$ | async"
         [playMidiNote]="actions.playMidiNote.bind(actions)">
-      </channel-canvas>
+      </sequence-canvas>
       <keyboard [playMidiNote]="actions.playMidiNote.bind(actions)">
       </keyboard>
     </rio-container>

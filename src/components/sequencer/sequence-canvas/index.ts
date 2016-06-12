@@ -9,7 +9,7 @@ import { Map } from 'immutable';
 
 
 @Component({
-  selector: 'channel-canvas',
+  selector: 'sequence-canvas',
   template: `
     <div>
       <div *ngFor="let channel of sequenceData" style="background:#333;" 
@@ -29,7 +29,7 @@ import { Map } from 'immutable';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class ChannelCanvas {
+export class SequenceCanvas {
   @Input() channelCount: number = 0;
   @Input() measureCount: number = 0;
   @Input() sequenceData: Array<Array<number>> = [];

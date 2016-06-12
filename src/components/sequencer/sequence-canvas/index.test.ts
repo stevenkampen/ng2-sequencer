@@ -11,12 +11,12 @@ import { ComponentFixture, TestComponentBuilder }
 from '@angular/compiler/testing';
 import { Component } from '@angular/core';
 import { By } from '@angular/platform-browser';
-import { ChannelCanvas } from './index';
+import { SequenceCanvas } from './index';
 
-describe('Component: Sequencer - ChannelCanvas', () => {
+describe('Component: Sequencer - SequenceCanvas', () => {
   let builder: TestComponentBuilder;
 
-  beforeEachProviders(() => [ChannelCanvas]);
+  beforeEachProviders(() => [SequenceCanvas]);
   beforeEach(inject([TestComponentBuilder],
     function (tcb: TestComponentBuilder) {
       builder = tcb;
