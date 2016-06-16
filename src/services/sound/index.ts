@@ -6,7 +6,8 @@ const p5sound = require('p5sound');
 interface IP5 {
   Env: (envelopeOptions: Array<number>) => void;
   SinOsc: () => void;
-  midiToFreq: (number) => void;
+  midiToFreq: (number) => number;
+  getAudioContext: () => AudioContext,
 }
 
 @Injectable()
@@ -21,18 +22,18 @@ export class SoundService {
     });
   }
 
-  public playNote(note: number) {
+  public playNote(note: number, time?: number) {
     // , envelopeOptions: Array<number> = 
     //    [ 0.010, 1.000, 0.000, 1.000, 0.000, 1.000, 0.500 ]) {
 
     const osc = new p5.SinOsc();
     osc.amp(0);
-    osc.start();
+    osc.start(time);
     const freq = this.p5.midiToFreq(note);
     // console.log('freq:', freq);
     osc.freq(freq);
-    osc.amp(0.5, 0.05);
-    setTimeout(() => osc.amp(0, 0.2), 100);
+    osc.amp(0.5, 0.05, time);
+    osc.amp(0, 0.2, time + 0.2);
 
     // const env = new this.p5.Env();
     // set attackTime, decayTime, sustainRatio, releaseTime
@@ -40,6 +41,28 @@ export class SoundService {
     // env.setRange(1, 0);
     // env.play(osc);
 
+  }
+
+  public playSequence(sequence: Array<any>) {
+    const startTime = this.p5.getAudioContext().currentTime + 0.005;
+
+    const schedulePeriod = (fromNote: number = 0) => {
+      const currentTime = this.p5.getAudioContext().currentTime;
+      const timeSinceStart = currentTime - startTime;
+      console.log('SchedulePeriod time:', currentTime);
+      console.log('timeSinceStart:', timeSinceStart);
+      while (sequence[fromNote] < timeSinceStart + 0.200) {
+        console.log('Playing note %s in %s second', sequence[fromNote], sequence[fromNote] - timeSinceStart);
+        this.playNote(63, sequence[fromNote] - timeSinceStart);
+        fromNote++;
+      }
+
+      if (fromNote < sequence.length) {
+        requestAnimationFrame(() => schedulePeriod(fromNote));
+      }
+    };
+
+    schedulePeriod();
   }
 
   public getCanvas() {

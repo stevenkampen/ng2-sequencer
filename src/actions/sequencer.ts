@@ -18,6 +18,7 @@ export class SequencerActions {
 
   play() {
     this.ngRedux.dispatch({ type: SequencerActions.PLAY });
+    this.soundService.playSequence([0.75, 1.5, 1.75, 2.25]);
   }
 
   playMidiNote(note: number) {
@@ -26,6 +27,7 @@ export class SequencerActions {
 
   pause() {
     this.ngRedux.dispatch({ type: SequencerActions.PAUSE });
+    this.soundService.playSequence([0.5, 0.75, 0.80, 1.2, 1.5, 1.75, 2.25]);
   }
 
   addMeasure() {
