@@ -13,10 +13,6 @@ import { APP_BASE_HREF } from '@angular/common/index';
 import { NgRedux } from 'ng2-redux';
 
 import { RioSampleApp } from './containers/sample-app';
-import { SessionActions } from './actions/session';
-import { CounterActions } from './actions/counter';
-import { AuthService } from './services/auth/';
-import { ServerService } from './services/server/';
 import { SoundService } from './services/sound/';
 
 declare let __PRODUCTION__: any;
@@ -31,11 +27,7 @@ if (__PRODUCTION__) {
 
 bootstrap(RioSampleApp, [
   NgRedux,
-  SessionActions,
-  CounterActions,
   SoundService,
-  AuthService,
-  ServerService,
   HTTP_PROVIDERS,
   ROUTER_PROVIDERS,
   provide(APP_BASE_HREF, { useValue: '/' })

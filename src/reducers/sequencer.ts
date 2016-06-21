@@ -1,5 +1,4 @@
 import { SequencerActions } from '../actions/sequencer';
-import { SessionActions } from '../actions/session';
 import { List, Map, fromJS } from 'immutable';
 
 const DUMMY_TEMPO = 120;
@@ -145,9 +144,6 @@ export function sequencerReducer(
 
   case SequencerActions.REMOVE_CHANNEL:
       return state.update('channelCount', (value) => value - 1);
-
-  case SessionActions.LOGOUT_USER:
-    return state.merge(INITIAL_STATE);
 
   default:
     return state;

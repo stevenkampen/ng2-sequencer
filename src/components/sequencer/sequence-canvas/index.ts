@@ -119,6 +119,7 @@ export class SequenceCanvas implements OnChanges {
         const offset = this.sequenceLength * 50 * elapsedPercentage * 2;
         this.elem.nativeElement.style.marginLeft = `-${offset}px`;
       }, null, () => {
+        console.log('Sequence done in canvas. Resetting margin.');
         this.elem.nativeElement.style.marginLeft = `0`;
       });
     }
