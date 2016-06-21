@@ -49,7 +49,8 @@ import {
         [looping]="looping | async"
         [play]="actions.play.bind(actions, compiledSequenceData | async,
           sequenceLength | async, bpm | async, shouldRepeat)"
-        [stop]="actions.stop.bind(actions, currentlyPlayingSubscription | async)"
+        [stop]="actions.stop.bind(actions, 
+          currentlyPlayingSubscription | async)"
         [toggleLooping]="actions.toggleLooping.bind(actions)">
       </play-controls>
       <sequence-canvas class="flex-auto flex flex-column canvas-container"

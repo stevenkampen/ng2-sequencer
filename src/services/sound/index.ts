@@ -57,7 +57,8 @@ export class SoundService {
         if (!stopped) {
           while (fromNoteIndex < sequence.length) {
 
-            const timeSinceStart = this.p5.getAudioContext().currentTime - startTime;
+            const timeSinceStart
+              = this.p5.getAudioContext().currentTime - startTime;
             const noteTimeInSeconds = sequence[fromNoteIndex].time * bpm / 60;
 
             if (noteTimeInSeconds > timeSinceStart + 0.200) {
@@ -95,7 +96,7 @@ export class SoundService {
       return () => {
         stopped = true;
         observer.complete();
-      }
+      };
 
     });
 

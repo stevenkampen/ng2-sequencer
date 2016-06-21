@@ -31,7 +31,11 @@ export class SequencerActions {
   constructor(private ngRedux: NgRedux<IAppState>,
               private soundService: SoundService) {}
 
-  play(sequence: any, length: number, bpm: number, shouldRepeat: () => boolean) {
+  play(sequence: any,
+       length: number,
+       bpm: number,
+       shouldRepeat: () => boolean) {
+
     const tickObservable: Observable<number> = this.soundService.playSequence(
       sequence.toJS(),
       length,
