@@ -17,8 +17,8 @@ class SequencerActions {
   play() {
     return 'play;';
   }
-  pause() {
-    return 'pause';
+  stop() {
+    return 'stop';
   }
 }
 
@@ -41,13 +41,13 @@ describe('Component: Sequencer - PlayControls', () => {
     }))
   );
 
-  it('should call pause function',
+  it('should call stop function',
     async(inject([PlayControls], (component: PlayControls) => {
       const SequencerActions_ = new SequencerActions;
-      spyOn(SequencerActions_, 'pause').and.returnValue('pause');
-      component.pause = SequencerActions_.pause;
-      component.pause();
-      expect(SequencerActions_.pause).toHaveBeenCalled();
+      spyOn(SequencerActions_, 'stop').and.returnValue('stop');
+      component.stop = SequencerActions_.stop;
+      component.stop();
+      expect(SequencerActions_.stop).toHaveBeenCalled();
     }))
   );
 });

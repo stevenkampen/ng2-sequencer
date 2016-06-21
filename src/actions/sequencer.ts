@@ -2,10 +2,15 @@ import { Injectable } from '@angular/core';
 import { NgRedux } from 'ng2-redux';
 import { IAppState } from '../reducers';
 import { SoundService } from '../services/sound';
+import {
+  Observable,
+  Subscription,
+  Subscriber,
+} from 'rxjs';
 
 @Injectable()
 export class SequencerActions {
-  static PAUSE = 'PAUSE';
+  static STOP = 'STOP';
   static PLAY = 'PLAY';
   static ADD_MEASURE = 'ADD_MEASURE';
   static REMOVE_MEASURE = 'REMOVE_MEASURE';
@@ -13,21 +18,53 @@ export class SequencerActions {
   static REMOVE_CHANNEL = 'REMOVE_CHANNEL';
   static TOGGLE_LOOPING = 'TOGGLE_LOOPING';
 
+  private DUMMY_SEQUENCE = [
+    { note: 63, time: 0.10 },
+    { note: 73, time: 0.40 },
+    { note: 53, time: 0.60 },
+    { note: 65, time: 0.90 },
+    { note: 66, time: 1.15 },
+    { note: 57, time: 1.56 },
+    { note: 48, time: 1.75 },
+  ];
+
   constructor(private ngRedux: NgRedux<IAppState>,
               private soundService: SoundService) {}
 
-  play() {
-    this.ngRedux.dispatch({ type: SequencerActions.PLAY });
-    this.soundService.playSequence([0.75, 1.5, 1.75, 2.25]);
+  play(sequence: any, length: number, bpm: number, shouldRepeat: () => boolean) {
+    const tickObservable: Observable<number> = this.soundService.playSequence(
+      sequence.toJS(),
+      length,
+      shouldRepeat,
+      bpm);
+
+    const totalTime = length * bpm / 60;
+
+    const subscription: any = tickObservable.subscribe(time => {
+      console.info('playing...');
+    }, null, () => {
+      // "completed"
+    });
+
+    // tickObservable.throttleTime(500).subscribe(time => {
+    //   console.log('playing...', time);
+    // }, null);
+
+    this.ngRedux.dispatch({
+      type: SequencerActions.PLAY,
+      tickObservable: tickObservable,
+      subscription: subscription,
+    });
   }
 
   playMidiNote(note: number) {
     this.soundService.playNote(note);
   }
 
-  pause() {
-    this.ngRedux.dispatch({ type: SequencerActions.PAUSE });
-    this.soundService.playSequence([0.5, 0.75, 0.80, 1.2, 1.5, 1.75, 2.25]);
+  stop(subscriber: Subscriber<number>) {
+    console.log('Unsubscribing. Should trigger end...');
+    subscriber.unsubscribe();
+    this.ngRedux.dispatch({ type: SequencerActions.STOP });
   }
 
   addMeasure() {
