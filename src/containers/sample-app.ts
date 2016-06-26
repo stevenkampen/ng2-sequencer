@@ -23,7 +23,7 @@ import { middleware, enhancers } from '../store';
 })
 @RouteConfig([
   {
-    path: '/sequencer',
+    path: '/',
     name: 'Sequencer',
     component: SequencerPage,
     useAsDefault: true
