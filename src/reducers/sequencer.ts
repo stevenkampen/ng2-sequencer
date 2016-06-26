@@ -4,41 +4,109 @@ import { List, Map, fromJS } from 'immutable';
 const DUMMY_TEMPO = 120;
 
 const DUMMY_SEQUENCE_DATA = List([
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
   [
+    0.25,
+    0.75,
     1.00,
-    2.00,
-    3.00,
-    4.00,
+    1.25,
+    1.50,
+    1.75,
   ],
   [
+    0.50,
     1.00,
-    2.00,
+    1.75,
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+    0.55,
+    1.60,
+    1.90,
     3.00,
-    4.00,
   ],
   [
+    0.87,
+    2.54,
+    3.00,
   ],
-  [
-  ],
-  [
-  ],
-  [
-  ],
-  [
-  ],
-  [
-  ],
-  [
-  ],
-  [
-  ],
-  [
-  ],
-  [
-  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
 ]);
 
 const NOTES = fromJS([
+  { header: 'C', number: 60 },
+  { header: 'C#', number: 61 },
+  { header: 'D', number: 62 },
+  { header: 'D#', number: 63 },
+  { header: 'E', number: 64 },
+  { header: 'F', number: 65 },
+  { header: 'F#', number: 66 },
+  { header: 'G', number: 67 },
+  { header: 'G#', number: 68 },
+  { header: 'A', number: 69 },
+  { header: 'A#', number: 70 },
+  { header: 'B', number: 71 }, 
   { header: 'C', number: 72 },
   { header: 'C#', number: 73 },
   { header: 'D', number: 74 },
@@ -51,6 +119,30 @@ const NOTES = fromJS([
   { header: 'A', number: 81 },
   { header: 'A#', number: 82 },
   { header: 'B', number: 83 },
+  { header: 'C', number: 84 },
+  { header: 'C#', number: 85 },
+  { header: 'D', number: 86 },
+  { header: 'D#', number: 87 },
+  { header: 'E', number: 88 },
+  { header: 'F', number: 89 },
+  { header: 'F#', number: 90 },
+  { header: 'G', number: 91 },
+  { header: 'G#', number: 92 },
+  { header: 'A', number: 93 },
+  { header: 'A#', number: 94 },
+  { header: 'B', number: 95 },
+  { header: 'C', number: 96 },
+  { header: 'C#', number: 97 },
+  { header: 'D', number: 98 },
+  { header: 'D#', number: 99 },
+  { header: 'E', number: 100 },
+  { header: 'F', number: 101 },
+  { header: 'F#', number: 102 },
+  { header: 'G', number: 103 },
+  { header: 'G#', number: 104 },
+  { header: 'A', number: 105 },
+  { header: 'A#', number: 106 },
+  { header: 'B', number: 107 },
 ]);
 
 interface ISound {

@@ -32,10 +32,7 @@ import { Observable } from 'rxjs';
       </ul>
       <div class="sequence-board flex-auto">
         <div #sequencePanel class="sequence-panel"
-          [ngStyle]="{
-            'margin-left': '-' + calcOffset(currentPosition) + 'px',
-            width: sequenceLength * 100 + 'px'
-          }">
+          [ngStyle]="{'margin-left': '-' + calcOffset(currentPosition) + 'px'}">
           <div *ngFor="let channelIndex of channelRange | async; let odd = odd"
             class="channel"
             [ngClass]="{ odd: odd }">
@@ -44,6 +41,8 @@ import { Observable } from 'rxjs';
               class="note">
             </div>
           </div>
+          <div class="end-guide"
+            [style.left]="calcOffset(sequenceLength) + 'px'"></div>
         </div>
       </div>
     </div>
@@ -61,37 +60,46 @@ import { Observable } from 'rxjs';
       overflow: hidden;
     }
     .sequence-board .channel {
-      height: 1.5em;
+      height: 14px;
       color: #CECECE;
       position: relative;
       background-color: rgba(0, 0, 0, .3);
     }
+    .sequence-panel .end-guide {
+      position: absolute;
+      top: 0;
+      width: 1px;
+      background: red;
+      height: 100%;
+    }
     .sequence-board .channel.odd {
-      background-color: rgba(0, 0, 0, .7);
+      background-color: rgba(0, 0, 0, .5);
     }
     .sequence-panel {
+      position: relative;
     }
     ul.channel-headers {
-      width: 100px;
-      text-align: right;
+      width: 3em;  
       margin: 0;
     }
     ul.channel-headers li {
-      height: 1.5em;
-      background: #666;
-      padding-right: .5em;
+      font-size: .6em;
+      font-weight: bold;
+      height: 14px;
+      background: #CECECE;
+      padding: 0 .4em;
     }
     ul.channel-headers li.odd {
-      background: #CECECE;
+      background: #999;
     }
     .note {
       position: absolute;
-      top: 8px;
-      margin-left: -5px;
-      height: 10px;
-      width: 10px;
+      top: 3px;
+      margin-left: -4px;
+      height: 8px;
+      width: 8px;
       background: red;
-      border-radius: 5px;
+      border-radius: 4px;
     }
     `,
   ],
