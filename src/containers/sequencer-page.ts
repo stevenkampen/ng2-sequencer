@@ -56,13 +56,12 @@ import {
       </play-controls>
       <sequence-canvas class="flex-auto flex flex-column canvas-container"
         [currentlyPlayingTimer]="currentlyPlayingTimer | async"
-        [channelHeaders]="channelHeaders | async"
+        [channels]="channels | async"
         [channelData]="channelData | async"
         [bpm]="bpm | async"
         [currentPosition]="currentPosition | async"
         [playing]="playing | async"
         [sequenceLength]="sequenceLength | async"
-        [channelRange]="channelRange | async"
         [playMidiNote]="actions.playMidiNote.bind(actions)">
       </sequence-canvas>
     </div>
@@ -82,8 +81,8 @@ export class SequencerPage {
   @select(n => n.sequencer.get('looping'))
   private looping: Observable<boolean>;
 
-  @select(n => n.sequencer.get('channelHeaders'))
-  private channelHeaders: Observable<any>;
+  @select(n => n.sequencer.get('channels'))
+  private channels: Observable<Array<any>>;
 
   @select(n => n.sequencer.get('channelData'))
   private channelData: Observable<any>;
@@ -99,8 +98,5 @@ export class SequencerPage {
 
   @select(n => n.sequencer.get('currentPosition'))
   private currentPosition: Observable<number>;
-
-  @select(n => Observable.range(0, n.sequencer.get('channelCount')).toArray())
-  private channelRange: Observable<Array<number>>;
 
 }

@@ -25,19 +25,20 @@ import { Observable } from 'rxjs';
   template: `
     <div class="flex outer-wrapper">
       <ul class="flex-none list-reset channel-headers">
-        <li *ngFor="let channelIndex of channelRange | async; let odd = odd"
+        <li *ngFor="let channel of channels; let odd = odd"
+        (click)="playMidiNote(channel.get('data').get('note'))"
           [ngClass]="{ odd: odd }">
-          {{ channelHeaders.get(channelIndex) }}
+          {{ channel.get('header') }}
         </li>
       </ul>
       <div class="sequence-board flex-auto">
         <div #sequencePanel class="sequence-panel"
           [ngStyle]="{'margin-left': '-' + calcOffset(currentPosition) + 'px'}">
-          <div *ngFor="let channelIndex of channelRange | async; let odd = odd"
+          <div *ngFor="let channel of channels; let odd = odd; let i = index;"
             class="channel"
             [ngClass]="{ odd: odd }">
-            <div *ngFor="let noteTiming of channelData.get(channelIndex)"
-              [style.left]="noteTiming * 100 + 'px'"
+            <div *ngFor="let noteTiming of channelData.get(i)"
+              [style.left]="noteTiming.time * 100 + 'px'"
               class="note">
             </div>
           </div>
@@ -107,9 +108,8 @@ import { Observable } from 'rxjs';
 })
 
 export class SequenceCanvas implements OnChanges {
-  @Input() channelRange: Observable<Array<number>>;
   @Input() currentPosition: number;
-  @Input() channelHeaders: Array<string>;
+  @Input() channels: Array<any>;
   @Input() channelData: Array<Array<any>>;
   @Input() playing: any;
   @Input() sequenceLength: number;

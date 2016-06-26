@@ -5,10 +5,17 @@ import {
   Subject,
 } from 'rxjs';
 
+import {
+  playSound,
+  SoundType,
+  SoundContext,
+  MidiOscOptions,
+} from './sound-types';
+
 const p5 = require('p5');
 const p5sound = require('p5sound');
 
-interface IP5 {
+export interface IP5 {
   Env: (envelopeOptions: Array<number>) => void;
   SinOsc: () => void;
   midiToFreq: (number) => number;
@@ -32,7 +39,7 @@ export class SoundService {
   public playNote(
     note: number,
     time: number = 0,
-    gainNode: any = null,
+    gainNode: any = this.mainGainNode,
     attackLevel: number = 1.0,
     releaseLevel: number = 0,
     attackTime: number = 0.001,
@@ -40,23 +47,21 @@ export class SoundService {
     susPercent: number = 0.2,
     releaseTime: number = 0.5) {
 
-
-    // console.info('playing sound:', note, time);
-
-    const env = new p5.Env();
-    env.setADSR(attackTime, decayTime, susPercent, releaseTime);
-    env.setRange(attackLevel, releaseLevel);
-
-    const osc = new p5.SinOsc();
-
-    // plug the oscillator into the gain
-    osc.disconnect();
-    gainNode.setInput(osc);
-
-    osc.start(time);
-    osc.freq(this.p5.midiToFreq(note));
-    env.play(osc, time);
-
+    playSound({
+      time: time,
+      type: SoundType.MIDI_OSC,
+      gain: this.mainGainNode,
+      p5: this.p5,
+      data: {
+        note: note,
+        attackLevel,
+        releaseLevel,
+        attackTime,
+        decayTime,
+        susPercent,
+        releaseTime,
+      },
+    });
   }
 
   public playSequence(
@@ -110,7 +115,13 @@ export class SoundService {
               const noteBeatOffset = note.time - beatsElapsed;
               if (noteBeatOffset > 0) {
                 const timeOffset = noteBeatOffset / beatsToSecondsFactor;
-                this.playNote(note.note, timeOffset, gain);
+                playSound({
+                  time: timeOffset,
+                  type: SoundType.MIDI_OSC,
+                  gain: gain,
+                  p5: this.p5,
+                  data: note.data,
+                });
               }
             });
 
