@@ -1,6 +1,9 @@
 import { Injectable, provide } from '@angular/core';
 
-import { Observable } from 'rxjs/Observable';
+import {
+  Observable,
+  Subject,
+} from 'rxjs';
 
 const p5 = require('p5');
 const p5sound = require('p5sound');
@@ -15,6 +18,7 @@ interface IP5 {
 @Injectable()
 export class SoundService {
   private p5: IP5;
+  private mainGainNode = new p5.Gain();
 
   constructor() {
     this.p5 = new p5(p => {
@@ -22,11 +26,13 @@ export class SoundService {
         p.createCanvas(100, 100);
       };
     });
+    this.mainGainNode.connect();
   }
 
   public playNote(
     note: number,
     time: number = 0,
+    gainNode: any = null,
     attackLevel: number = 1.0,
     releaseLevel: number = 0,
     attackTime: number = 0.001,
@@ -34,79 +40,84 @@ export class SoundService {
     susPercent: number = 0.2,
     releaseTime: number = 0.5) {
 
+
+    // console.info('playing sound:', note, time);
+
     const env = new p5.Env();
     env.setADSR(attackTime, decayTime, susPercent, releaseTime);
     env.setRange(attackLevel, releaseLevel);
 
     const osc = new p5.SinOsc();
-    osc.amp(env);
-    osc.start();
+
+    // plug the oscillator into the gain
+    osc.disconnect();
+    gainNode.setInput(osc);
+
+    osc.start(time);
     osc.freq(this.p5.midiToFreq(note));
     env.play(osc, time);
+
   }
 
-  public playSequence(sequence: Array<any>, length: number, 
-    shouldRepeat: () => boolean, bpm: number = 120) {
+  public playSequence(
+    getNextSoundsAfterBeat: (lastScheduledBeat) => any,
+    bpm: number = 120,
+    beatOffset: number = 0) {
 
-    let startTime = this.p5.getAudioContext().currentTime + 0.005;
+    let startTime;
+    const gain = new p5.Gain();
+    gain.connect(this.mainGainNode);
+
+    const progress = new Subject();
+
     let stopped = false;
+    const stop = () => {
+      // console.info('stop');
+      progress.next(0);
+      gain.disconnect();
+      stopped = true;
+    };
 
-    const observable = new Observable<number>(observer => {
+    let lastScheduledBeat = beatOffset;
 
-      const schedulePeriod = (fromNoteIndex: number = 0) => {
-        if (!stopped) {
-          while (fromNoteIndex < sequence.length) {
+    let notes = getNextSoundsAfterBeat(0);
 
-            const timeSinceStart
-              = this.p5.getAudioContext().currentTime - startTime;
-            const noteTimeInSeconds = sequence[fromNoteIndex].time * bpm / 60;
+    const retriggerTimingFrame = () => {
+      if (!stopped) {
+        requestAnimationFrame(() => {
+          startTime = startTime
+            || this.p5.getAudioContext().currentTime + 0.005;
 
-            if (noteTimeInSeconds > timeSinceStart + 0.200) {
-              // next note is more than 200ms away
-              break;
-            }
+          const elapsedTime = this.p5.getAudioContext().currentTime - startTime;
+          const beatsElapsed = elapsedTime * bpm / 60 + beatOffset;
 
-            this.playNote(sequence[fromNoteIndex].note,
-              noteTimeInSeconds - timeSinceStart);
-
-            fromNoteIndex++;
+          // notify progress
+          if (beatsElapsed >= 0) {
+            progress.next(beatsElapsed);
           }
 
-          const timeElapsed = this.p5.getAudioContext().currentTime - startTime;
-          const totalTime = length * bpm / 60;
-          const sequenceElapsed = timeElapsed >= totalTime;
+          while (notes.length && lastScheduledBeat < beatsElapsed
+            + 0.2 * (bpm / 60)) {
 
-          if (sequenceElapsed && shouldRepeat && shouldRepeat()) {
-            fromNoteIndex = 0;
-            startTime = this.p5.getAudioContext().currentTime;
-            requestAnimationFrame(() => schedulePeriod(fromNoteIndex));
-            observer.next(this.p5.getAudioContext().currentTime - startTime);
-          } else if (sequenceElapsed) {
-            // call done
-            observer.complete();
-          } else {
-            requestAnimationFrame(() => schedulePeriod(fromNoteIndex));
-            observer.next(this.p5.getAudioContext().currentTime - startTime);
+            // queue this batch of sounds
+            notes.map(note => {
+              const timeOffset = note.time / (bpm / 60) - elapsedTime;
+              this.playNote( note.note, timeOffset, gain);
+            });
+
+            // progress to the next beat position
+            lastScheduledBeat = notes[0].time;
+            notes = getNextSoundsAfterBeat(lastScheduledBeat);
+
           }
-        }
-      };
 
-      schedulePeriod();
+          retriggerTimingFrame();
+        });
+      }
+    };
 
-      return () => {
-        stopped = true;
-        observer.complete();
-      };
+    retriggerTimingFrame();
 
-    });
-
-    // make it "hot"
-    observable.publish();
-
-    return observable;
-  }
-
-  public getCanvas() {
-    // return this.p5.canvas;
+    return { stop, progress };
   }
 }

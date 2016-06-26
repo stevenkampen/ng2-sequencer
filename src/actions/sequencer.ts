@@ -6,6 +6,7 @@ import {
   Observable,
   Subscription,
   Subscriber,
+  Subject,
 } from 'rxjs';
 
 @Injectable()
@@ -18,46 +19,78 @@ export class SequencerActions {
   static REMOVE_CHANNEL = 'REMOVE_CHANNEL';
   static TOGGLE_LOOPING = 'TOGGLE_LOOPING';
 
-  private DUMMY_SEQUENCE = [
-    { note: 63, time: 0.10 },
-    { note: 73, time: 0.40 },
-    { note: 53, time: 0.60 },
-    { note: 65, time: 0.90 },
-    { note: 66, time: 1.15 },
-    { note: 57, time: 1.56 },
-    { note: 48, time: 1.75 },
-  ];
-
   constructor(private ngRedux: NgRedux<IAppState>,
               private soundService: SoundService) {}
 
-  play(sequence: any,
-       length: number,
-       bpm: number,
-       shouldRepeat: () => boolean) {
+  play() {
+    const { stop, progress } = this.soundService.playSequence(
+      lastScheduledBeat => {
+        // console.time('findNote');
 
-    const tickObservable: Observable<number> = this.soundService.playSequence(
-      sequence.toJS(),
-      length,
-      shouldRepeat,
-      bpm);
+        const sequenceData
+          = this.ngRedux.getState().sequencer.get('compiledSequenceData');
 
-    const totalTime = length * bpm / 60;
+        // console.log('Looking for time:%s in items',
+        //   lastScheduledBeat,
+        //   sequenceData.toJS());
 
-    const subscription: any = tickObservable.subscribe(time => {
-      console.info('playing...');
-    }, null, () => {
-      // "completed"
+        let searchRangeStart = 0;
+        let searchRangeEnd = sequenceData.size - 1;
+        let i = Math.floor(searchRangeStart + searchRangeEnd / 2);
+        // console.log('i:', i);
+        const notes = [];
+        while (true) {
+          const valueAt = sequenceData.get(i);
+          if (valueAt.time <= lastScheduledBeat) {
+            if (i === sequenceData.size - 1) {
+              break;
+            }
+            // this note is earlier than our current beat
+            searchRangeStart = i + 1;
+            i = Math.floor(searchRangeStart
+              + (searchRangeEnd - searchRangeStart) / 2);
+            // console.log('i:', i);
+          } else if (valueAt.time > lastScheduledBeat
+            && (i === 0 || sequenceData.get(i - 1).time <= lastScheduledBeat)) {
+            // this is the note we're looking for...
+            notes.push(valueAt);
+            while (sequenceData.get(i + 1) && 
+              sequenceData.get(i + 1).time === valueAt.time) {
+              notes.push(sequenceData.get(i + 1));
+              i++;
+            }
+            break;
+          } else if (valueAt.time > lastScheduledBeat) {
+            // this note is later than our current beat
+            searchRangeEnd = i - 1;
+            i = Math.floor(searchRangeStart
+              + (searchRangeEnd - searchRangeStart) / 2);
+            // console.log('i:', i);
+          }
+        }
+        // console.debug('notes', notes);
+        // console.timeEnd('findNote');
+        return notes;
+
+      }, this.ngRedux.getState().sequencer.get('bpm'));
+
+    progress.subscribe(elapsedBeats => {
+      if (elapsedBeats >=
+        this.ngRedux.getState().sequencer.get('sequenceLength')) {
+        stop();
+        this.stop();
+        if (this.ngRedux.getState().sequencer.get('looping')) {
+          this.play();
+        }
+      }
     });
-
-    // tickObservable.throttleTime(500).subscribe(time => {
-    //   console.log('playing...', time);
-    // }, null);
 
     this.ngRedux.dispatch({
       type: SequencerActions.PLAY,
-      tickObservable: tickObservable,
-      subscription: subscription,
+      payload: {
+        stop,
+        progress,
+      }
     });
   }
 
@@ -65,10 +98,12 @@ export class SequencerActions {
     this.soundService.playNote(note);
   }
 
-  stop(subscriber: Subscriber<number>) {
-    console.log('Unsubscribing. Should trigger end...');
-    subscriber.unsubscribe();
-    this.ngRedux.dispatch({ type: SequencerActions.STOP });
+  stop() {
+    const playing = this.ngRedux.getState().sequencer.get('playing');
+    if (playing) {
+      playing.stop();
+      this.ngRedux.dispatch({ type: SequencerActions.STOP });
+    }
   }
 
   addMeasure() {

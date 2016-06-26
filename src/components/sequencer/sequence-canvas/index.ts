@@ -98,11 +98,10 @@ export class SequenceCanvas implements OnChanges {
   @Input() measureRange: Observable<Array<number>>;
   @Input() channelHeaders: Array<string>;
   @Input() channelData: Array<Array<any>>;
+  @Input() playing: any;
   @Input() sequenceLength: number;
   @Input() bpm: number;
-  @Input() playingObservable: Observable<number>;
   @Input() playMidiNote: (number) => void;
-  @Input() currentlyPlayingTimer: Observable<number>;
 
   @ViewChild('sequencePanel') elem: ElementRef;
 
@@ -110,18 +109,22 @@ export class SequenceCanvas implements OnChanges {
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
 
-    let chng = changes['currentlyPlayingTimer'];
+    let chng = changes['playing'];
+
+    const resetOffset = () => {
+      this.elem.nativeElement.style.marginLeft = `0`;
+    };
 
     if (chng && chng.currentValue && chng.previousValue !== chng.currentValue) {
       const totalTime = this.sequenceLength * this.bpm / 60;
-      this.currentlyPlayingTimer.subscribe(time => {
-        const elapsedPercentage = time / totalTime;
+      this.playing.progress.subscribe(beatsElapsed => {
+        const elapsedPercentage = beatsElapsed / this.sequenceLength;
         const offset = this.sequenceLength * 50 * elapsedPercentage * 2;
         this.elem.nativeElement.style.marginLeft = `-${offset}px`;
-      }, null, () => {
-        console.log('Sequence done in canvas. Resetting margin.');
-        this.elem.nativeElement.style.marginLeft = `0`;
-      });
+      }, resetOffset, resetOffset);
+    } else if (chng && chng.previousValue.progress && !chng.currentValue) {
+      resetOffset();
     }
+
   }
 };

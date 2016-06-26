@@ -22,9 +22,9 @@ import {
 
 @Component({
   selector: 'sequencer-page',
-  providers: [ SequencerActions ],
+  providers: [SequencerActions],
   directives: [RioContainer, PlayControls, SequenceCanvas, Keyboard],
-  pipes: [ AsyncPipe ],
+  pipes: [AsyncPipe],
   encapsulation: ViewEncapsulation.Emulated,
   styles: [`
   .sequencer-container {
@@ -47,10 +47,8 @@ import {
       <play-controls class="flex-none controls"
         [playing]="playing | async"
         [looping]="looping | async"
-        [play]="actions.play.bind(actions, compiledSequenceData | async,
-          sequenceLength | async, bpm | async, shouldRepeat)"
-        [stop]="actions.stop.bind(actions, 
-          currentlyPlayingSubscription | async)"
+        [play]="actions.play.bind(actions)"
+        [stop]="actions.stop.bind(actions)"
         [toggleLooping]="actions.toggleLooping.bind(actions)">
       </play-controls>
       <sequence-canvas class="flex-auto flex flex-column canvas-container"
@@ -58,6 +56,7 @@ import {
         [channelHeaders]="channelHeaders | async"
         [channelData]="channelData | async"
         [bpm]="bpm | async"
+        [playing]="playing | async"
         [sequenceLength]="sequenceLength | async"
         [measureRange]="measureRange | async"
         [channelRange]="channelRange | async"
@@ -75,7 +74,7 @@ export class SequencerPage {
   };
 
   @select(n => n.sequencer.get('playing'))
-  private playing: Observable<boolean>;
+  private playing: Observable<any>;
 
   @select(n => n.sequencer.get('looping'))
   private looping: Observable<boolean>;
@@ -100,11 +99,5 @@ export class SequencerPage {
 
   @select(n => Observable.range(0, n.sequencer.get('channelCount')).toArray())
   private channelRange: Observable<Array<number>>;
-
-  @select(n => n.sequencer.get('currentlyPlayingTimer'))
-  private currentlyPlayingTimer: Observable<Observable<number>>;
-
-  @select(n => n.sequencer.get('currentlyPlayingSubscription'))
-  private currentlyPlayingSubscription: Observable<Subscriber<number>>;
 
 }

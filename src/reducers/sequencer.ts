@@ -5,44 +5,36 @@ const DUMMY_TEMPO = 120;
 
 const DUMMY_SEQUENCE_DATA = List([
   [
-    0.25,
-    0.75,
     1.00,
-    1.25,
-    1.50,
-    1.75,
+    2.00,
+    3.00,
+    4.00,
   ],
   [
-    0.50,
     1.00,
-    1.75,
-  ],
-  [
-  ],
-  [
-  ],
-  [
-  ],
-  [
-  ],
-  [
-  ],
-  [
-  ],
-  [
-  ],
-  [
-  ],
-  [
-    0.55,
-    1.60,
-    1.90,
+    2.00,
     3.00,
+    4.00,
   ],
   [
-    0.87,
-    2.54,
-    3.00,
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
+  ],
+  [
   ],
 ]);
 
@@ -81,13 +73,12 @@ const DUMMY_TRACK_LENGTH = DUMMY_SEQUENCE_DATA_COMPILED
 
 const INITIAL_STATE = fromJS({
   looping: true,
-  playing: false,
+  playing: null,
+  currentPosition: 0, // in seconds
   channelCount: NOTES.size, // different sounds
   bpm: DUMMY_TEMPO, // bpm
   measureCount: 3, // number of bars
   channelHeaders: NOTES.map(v => v.get('header')),
-  currentlyPlayingTimer: null,
-  currentlyPlayingSubscription: null,
   channelData: DUMMY_SEQUENCE_DATA,
   compiledSequenceData: DUMMY_SEQUENCE_DATA_COMPILED,
   sequenceLength: DUMMY_TRACK_LENGTH,
@@ -119,16 +110,10 @@ export function sequencerReducer(
   switch (action.type) {
 
   case SequencerActions.PLAY:
-    return state.update('playing', (value) => true)
-                .update('currentlyPlayingTimer', () =>
-                  action.tickObservable)
-                .update('currentlyPlayingSubscription', () =>
-                  action.subscription);
+    return state.update('playing', (value) => action.payload);
 
   case SequencerActions.STOP:
-    return state.update('playing', (value) => false)
-                .update('currentlyPlayingTimer', () => null)
-                .update('currentlyPlayingSubscription', () => null);
+    return state.update('playing', (value) => null);
 
   case SequencerActions.TOGGLE_LOOPING:
     return state.update('looping', (value) => !value);
