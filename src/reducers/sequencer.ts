@@ -119,14 +119,8 @@ export function sequencerReducer(
   case SequencerActions.TOGGLE_LOOPING:
     return state.update('looping', (value) => !value);
 
-  case SequencerActions.TRACK_CURRENT_POSITION:
+  case SequencerActions.UPDATE_CURRENT_POSITION:
       return state.update('currentPosition', (value) => action.position);
-
-  case SequencerActions.ADD_MEASURE:
-    return state.update('measureCount', (value) => value + 1);
-
-  case SequencerActions.REMOVE_MEASURE:
-    return state.update('measureCount', (value) => value - 1);
 
   case SequencerActions.ADD_CHANNEL:
     return state.update('channelCount', (value) => value + 1);

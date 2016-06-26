@@ -48,7 +48,10 @@ import {
         [playing]="playing | async"
         [looping]="looping | async"
         [play]="actions.play.bind(actions, currentPosition | async)"
+        [pause]="actions.pause.bind(actions)"
         [stop]="actions.stop.bind(actions)"
+        [sequenceLength]="sequenceLength | async"
+        [changePosition]="actions.changePosition.bind(actions)"
         [toggleLooping]="actions.toggleLooping.bind(actions)">
       </play-controls>
       <sequence-canvas class="flex-auto flex flex-column canvas-container"

@@ -18,12 +18,15 @@ export class SequencerActions {
   static ADD_CHANNEL = 'ADD_CHANNEL';
   static REMOVE_CHANNEL = 'REMOVE_CHANNEL';
   static TOGGLE_LOOPING = 'TOGGLE_LOOPING';
-  static TRACK_CURRENT_POSITION = 'TRACK_CURRENT_POSITION';
+  static UPDATE_CURRENT_POSITION = 'UPDATE_CURRENT_POSITION';
 
   constructor(private ngRedux: NgRedux<IAppState>,
               private soundService: SoundService) {}
 
-  play(fromPosition: number = 0) {
+  play() {
+    const currentPosition = 
+      this.ngRedux.getState().sequencer.get('currentPosition');
+
     const playingContext = this.soundService.playSequence(
       lastScheduledBeat => {
         // console.time('findNote');
@@ -73,7 +76,7 @@ export class SequencerActions {
         // console.timeEnd('findNote');
         return notes;
 
-      }, this.ngRedux.getState().sequencer.get('bpm'), fromPosition);
+      }, this.ngRedux.getState().sequencer.get('bpm'), currentPosition);
 
     playingContext.progress.subscribe(elapsedBeats => {
       if (elapsedBeats >=
@@ -87,7 +90,7 @@ export class SequencerActions {
 
     // update redux state every 500ms with the current position
     playingContext.progress.throttleTime(200).subscribe(
-      this.trackCurrentPosition.bind(this));
+      this.updateCurrentPosition.bind(this));
 
     this.ngRedux.dispatch({
       type: SequencerActions.PLAY,
@@ -99,22 +102,49 @@ export class SequencerActions {
     this.soundService.playNote(note);
   }
 
-  stop() {
+  changePosition(delta) {
+    console.log('Change Position by:', delta);
     const playing = this.ngRedux.getState().sequencer.get('playing');
     const sequenceLength = this.ngRedux.getState().sequencer.get('sequenceLength');
+    const currentPosition = playing ? playing.currentPosition() :
+      this.ngRedux.getState().sequencer.get('currentPosition');
+    const newPosition = currentPosition + delta;
+
     if (playing) {
+      this.stop();
+    }
+
+    this.updateCurrentPosition(newPosition >=
+        sequenceLength ? 0 : Math.max(0, newPosition));
+
+    if (playing) {
+      this.play();
+    }
+  }
+
+  pause() {
+    this.stop(false);
+  }
+
+  stop(reset: boolean = true) {
+    const playing = this.ngRedux.getState().sequencer.get('playing');
+    const sequenceLength = this.ngRedux.getState().sequencer.get('sequenceLength');
+
+    if (playing) {
+
       this.ngRedux.dispatch({
         type: SequencerActions.STOP,
-        position: playing.currentPosition() >
+        position: reset || playing.currentPosition() >
           sequenceLength ? 0 : playing.currentPosition(),
       });
+
       playing.stop();
     }
   }
 
-  trackCurrentPosition(position) {
+  updateCurrentPosition(position) {
     this.ngRedux.dispatch({
-      type: SequencerActions.TRACK_CURRENT_POSITION,
+      type: SequencerActions.UPDATE_CURRENT_POSITION,
       position: position,
     });
   }

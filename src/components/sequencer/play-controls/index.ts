@@ -9,9 +9,30 @@ import {
   selector: 'play-controls',
   template: `
     <div class="flex control-bar">
-      <rio-button (click)="!playing ? play() : stop()">
+      <rio-button (click)="changePosition(-sequenceLength)">
+        <i class="fa fa-fast-backward">
+        </i>
+      </rio-button>
+      <rio-button (click)="changePosition(-2)">
+        <i class="fa fa-step-backward">
+        </i>
+      </rio-button>
+      <rio-button (click)="playing ? pause() : play()">
         <i class="fa"
-          [ngClass]="{'fa-stop': playing, 'fa-play': !playing }">
+          [ngClass]="{'fa-pause': playing, 'fa-play': !playing }">
+        </i>
+      </rio-button>
+      <rio-button (click)="changePosition(2)">
+        <i class="fa fa-step-forward">
+        </i>
+      </rio-button>
+      <rio-button (click)="playing ? stop() : null" [disabled]="!playing">
+        <i class="fa fa-stop">
+        </i>
+      </rio-button>
+      <rio-button (click)="toggleLooping()">
+        <i class="fa fa-refresh"
+          [ngClass]="{'fa-spin': looping }">
         </i>
       </rio-button>
     </div>
@@ -32,6 +53,9 @@ export class PlayControls {
   @Input() looping: boolean = false;
   @Input() play: () => void;
   @Input() stop: () => void;
+  @Input() pause: () => void;
+  @Input() sequenceLength: number;
+  @Input() changePosition: (beats) => void;
   @Input() toggleLooping: () => void;
 
   constructor() {
