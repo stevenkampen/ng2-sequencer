@@ -22,7 +22,7 @@ export class SequencerActions {
   constructor(private ngRedux: NgRedux<IAppState>,
               private soundService: SoundService) {}
 
-  play() {
+  play(fromPosition: number = 0) {
     const { stop, progress } = this.soundService.playSequence(
       lastScheduledBeat => {
         // console.time('findNote');
@@ -72,7 +72,7 @@ export class SequencerActions {
         // console.timeEnd('findNote');
         return notes;
 
-      }, this.ngRedux.getState().sequencer.get('bpm'));
+      }, this.ngRedux.getState().sequencer.get('bpm'), fromPosition);
 
     progress.subscribe(elapsedBeats => {
       if (elapsedBeats >=
