@@ -18,6 +18,7 @@ export class SequencerActions {
   static ADD_CHANNEL = 'ADD_CHANNEL';
   static REMOVE_CHANNEL = 'REMOVE_CHANNEL';
   static TOGGLE_LOOPING = 'TOGGLE_LOOPING';
+  static TRACK_CURRENT_POSITION = 'TRACK_CURRENT_POSITION';
 
   constructor(private ngRedux: NgRedux<IAppState>,
               private soundService: SoundService) {}
@@ -77,13 +78,15 @@ export class SequencerActions {
     progress.subscribe(elapsedBeats => {
       if (elapsedBeats >=
         this.ngRedux.getState().sequencer.get('sequenceLength')) {
-        stop();
-        this.stop();
-        if (this.ngRedux.getState().sequencer.get('looping')) {
-          this.play();
+          this.stop();
+          if (this.ngRedux.getState().sequencer.get('looping')) {
+            this.play();
+          }
         }
-      }
     });
+
+    // update redux state every 500ms with the current position
+    progress.throttleTime(200).subscribe(this.trackCurrentPosition.bind(this));
 
     this.ngRedux.dispatch({
       type: SequencerActions.PLAY,
@@ -102,8 +105,16 @@ export class SequencerActions {
     const playing = this.ngRedux.getState().sequencer.get('playing');
     if (playing) {
       playing.stop();
+      this.trackCurrentPosition(0);
       this.ngRedux.dispatch({ type: SequencerActions.STOP });
     }
+  }
+
+  trackCurrentPosition(position) {
+    this.ngRedux.dispatch({
+      type: SequencerActions.TRACK_CURRENT_POSITION,
+      position: position,
+    });
   }
 
   addMeasure() {

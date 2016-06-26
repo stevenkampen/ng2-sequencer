@@ -56,9 +56,9 @@ import {
         [channelHeaders]="channelHeaders | async"
         [channelData]="channelData | async"
         [bpm]="bpm | async"
+        [currentPosition]="currentPosition | async"
         [playing]="playing | async"
         [sequenceLength]="sequenceLength | async"
-        [measureRange]="measureRange | async"
         [channelRange]="channelRange | async"
         [playMidiNote]="actions.playMidiNote.bind(actions)">
       </sequence-canvas>
@@ -94,8 +94,8 @@ export class SequencerPage {
   @select(n => n.sequencer.get('bpm'))
   private bpm: Observable<number>;
 
-  @select(n => Observable.range(0, n.sequencer.get('measureCount')))
-  private measureRange: Observable<Array<number>>;
+  @select(n => n.sequencer.get('currentPosition'))
+  private currentPosition: Observable<number>;
 
   @select(n => Observable.range(0, n.sequencer.get('channelCount')).toArray())
   private channelRange: Observable<Array<number>>;

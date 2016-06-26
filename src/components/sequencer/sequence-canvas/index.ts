@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 
 import {
+  NgStyle,
   AsyncPipe,
 } from '@angular/common';
 
@@ -31,7 +32,10 @@ import { Observable } from 'rxjs';
       </ul>
       <div class="sequence-board flex-auto">
         <div #sequencePanel class="sequence-panel"
-          [ngStyle]="{ width: sequenceLength * bpm / 60 * 50 + 'px' }">
+          [ngStyle]="{
+            'margin-left': '-' + calcOffset(currentPosition) + 'px',
+            width: sequenceLength * 100 + 'px'
+          }">
           <div *ngFor="let channelIndex of channelRange | async; let odd = odd"
             class="channel"
             [ngClass]="{ odd: odd }">
@@ -45,6 +49,7 @@ import { Observable } from 'rxjs';
     </div>
   `,
   pipes: [ AsyncPipe ],
+  directives: [NgStyle],
   encapsulation: ViewEncapsulation.Emulated,
   styles: [`
     .outer-wrapper {
@@ -95,7 +100,7 @@ import { Observable } from 'rxjs';
 
 export class SequenceCanvas implements OnChanges {
   @Input() channelRange: Observable<Array<number>>;
-  @Input() measureRange: Observable<Array<number>>;
+  @Input() currentPosition: number;
   @Input() channelHeaders: Array<string>;
   @Input() channelData: Array<Array<any>>;
   @Input() playing: any;
@@ -107,23 +112,29 @@ export class SequenceCanvas implements OnChanges {
 
   constructor() {}
 
+  private calcOffset(beatsElapsed: number) {
+    const elapsedPercentage = beatsElapsed / this.sequenceLength;
+    const offset = this.sequenceLength * 50 * elapsedPercentage * 2;
+    return offset;
+  }
+
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
 
     let chng = changes['playing'];
 
     const resetOffset = () => {
-      this.elem.nativeElement.style.marginLeft = `0`;
+      if (this.elem) {
+        this.elem.nativeElement.style.marginLeft = `0`;
+      }
     };
 
     if (chng && chng.currentValue && chng.previousValue !== chng.currentValue) {
-      const totalTime = this.sequenceLength * this.bpm / 60;
       this.playing.progress.subscribe(beatsElapsed => {
-        const elapsedPercentage = beatsElapsed / this.sequenceLength;
-        const offset = this.sequenceLength * 50 * elapsedPercentage * 2;
-        this.elem.nativeElement.style.marginLeft = `-${offset}px`;
+        if (beatsElapsed < this.sequenceLength) {
+          this.elem.nativeElement.style.marginLeft
+            = `-${this.calcOffset(beatsElapsed)}px`;
+        }
       }, resetOffset, resetOffset);
-    } else if (chng && chng.previousValue.progress && !chng.currentValue) {
-      resetOffset();
     }
 
   }

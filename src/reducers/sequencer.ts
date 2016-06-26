@@ -72,9 +72,9 @@ const DUMMY_TRACK_LENGTH = DUMMY_SEQUENCE_DATA_COMPILED
   }, 0);
 
 const INITIAL_STATE = fromJS({
-  looping: true,
+  looping: false,
   playing: null,
-  currentPosition: 0, // in seconds
+  currentPosition: 0, // in beats
   channelCount: NOTES.size, // different sounds
   bpm: DUMMY_TEMPO, // bpm
   measureCount: 3, // number of bars
@@ -117,6 +117,9 @@ export function sequencerReducer(
 
   case SequencerActions.TOGGLE_LOOPING:
     return state.update('looping', (value) => !value);
+
+  case SequencerActions.TRACK_CURRENT_POSITION:
+      return state.update('currentPosition', (value) => action.position);
 
   case SequencerActions.ADD_MEASURE:
     return state.update('measureCount', (value) => value + 1);
