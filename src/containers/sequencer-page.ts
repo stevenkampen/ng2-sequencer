@@ -55,7 +55,6 @@ import {
         [toggleLooping]="actions.toggleLooping.bind(actions)">
       </play-controls>
       <sequence-canvas class="flex-auto flex flex-column canvas-container"
-        [currentlyPlayingTimer]="currentlyPlayingTimer | async"
         [channels]="channels | async"
         [channelData]="channelData | async"
         [bpm]="bpm | async"
