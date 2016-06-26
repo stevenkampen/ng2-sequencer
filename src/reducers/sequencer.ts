@@ -113,7 +113,8 @@ export function sequencerReducer(
     return state.update('playing', (value) => action.payload);
 
   case SequencerActions.STOP:
-    return state.update('playing', (value) => null);
+    return state.update('playing', (value) => null)
+                .update('currentPosition', (value) => action.position);
 
   case SequencerActions.TOGGLE_LOOPING:
     return state.update('looping', (value) => !value);

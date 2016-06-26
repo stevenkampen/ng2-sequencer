@@ -122,19 +122,13 @@ export class SequenceCanvas implements OnChanges {
 
     let chng = changes['playing'];
 
-    const resetOffset = () => {
-      if (this.elem) {
-        this.elem.nativeElement.style.marginLeft = `0`;
-      }
-    };
-
     if (chng && chng.currentValue && chng.previousValue !== chng.currentValue) {
       this.playing.progress.subscribe(beatsElapsed => {
         if (beatsElapsed < this.sequenceLength) {
           this.elem.nativeElement.style.marginLeft
             = `-${this.calcOffset(beatsElapsed)}px`;
         }
-      }, resetOffset, resetOffset);
+      });
     }
 
   }

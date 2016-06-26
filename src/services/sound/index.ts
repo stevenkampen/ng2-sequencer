@@ -73,15 +73,21 @@ export class SoundService {
     let stopped = false;
     const stop = () => {
       // console.info('stop');
-      progress.next(0);
       gain.amp(0, 0.1);
       setTimeout(() => gain.disconnect(), 100);
       stopped = true;
     };
 
+    const currentPosition = () => {
+      return Math.max(beatsElapsed, 0);
+    };
+
+    let beatsElapsed = beatOffset;
     let lastScheduledBeat = beatOffset;
 
-    let notes = getNextSoundsAfterBeat(0);
+    let notes = getNextSoundsAfterBeat(lastScheduledBeat);
+
+    const beatsToSecondsFactor = bpm / 60;
 
     const retriggerTimingFrame = () => {
       if (!stopped) {
@@ -90,20 +96,22 @@ export class SoundService {
             || this.p5.getAudioContext().currentTime + 0.005;
 
           const elapsedTime = this.p5.getAudioContext().currentTime - startTime;
-          const beatsElapsed = elapsedTime * bpm / 60 + beatOffset;
-
+          beatsElapsed = elapsedTime * beatsToSecondsFactor + beatOffset;
           // notify progress
-          if (beatsElapsed >= 0) {
+          if (!stopped && beatsElapsed >= 0) {
             progress.next(beatsElapsed);
           }
 
           while (notes.length && lastScheduledBeat < beatsElapsed
-            + 0.2 * (bpm / 60)) {
+            + 0.2 * beatsToSecondsFactor) {
 
             // queue this batch of sounds
             notes.map(note => {
-              const timeOffset = note.time / (bpm / 60) - elapsedTime;
-              this.playNote( note.note, timeOffset, gain);
+              const noteBeatOffset = note.time - beatsElapsed;
+              if (noteBeatOffset > 0) {
+                const timeOffset = noteBeatOffset / beatsToSecondsFactor;
+                this.playNote(note.note, timeOffset, gain);
+              }
             });
 
             // progress to the next beat position
@@ -119,6 +127,6 @@ export class SoundService {
 
     retriggerTimingFrame();
 
-    return { stop, progress };
+    return { stop, progress, currentPosition };
   }
 }

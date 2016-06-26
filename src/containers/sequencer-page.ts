@@ -47,7 +47,7 @@ import {
       <play-controls class="flex-none controls"
         [playing]="playing | async"
         [looping]="looping | async"
-        [play]="actions.play.bind(actions)"
+        [play]="actions.play.bind(actions, currentPosition | async)"
         [stop]="actions.stop.bind(actions)"
         [toggleLooping]="actions.toggleLooping.bind(actions)">
       </play-controls>

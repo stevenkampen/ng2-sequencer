@@ -24,7 +24,7 @@ export class SequencerActions {
               private soundService: SoundService) {}
 
   play(fromPosition: number = 0) {
-    const { stop, progress } = this.soundService.playSequence(
+    const playingContext = this.soundService.playSequence(
       lastScheduledBeat => {
         // console.time('findNote');
 
@@ -48,8 +48,8 @@ export class SequencerActions {
             }
             // this note is earlier than our current beat
             searchRangeStart = i + 1;
-            i = Math.floor(searchRangeStart
-              + (searchRangeEnd - searchRangeStart) / 2);
+            i = Math.floor(searchRangeStart +
+              (searchRangeEnd - searchRangeStart) / 2);
             // console.log('i:', i);
           } else if (valueAt.time > lastScheduledBeat
             && (i === 0 || sequenceData.get(i - 1).time <= lastScheduledBeat)) {
@@ -64,8 +64,8 @@ export class SequencerActions {
           } else if (valueAt.time > lastScheduledBeat) {
             // this note is later than our current beat
             searchRangeEnd = i - 1;
-            i = Math.floor(searchRangeStart
-              + (searchRangeEnd - searchRangeStart) / 2);
+            i = Math.floor(searchRangeStart +
+              (searchRangeEnd - searchRangeStart) / 2);
             // console.log('i:', i);
           }
         }
@@ -75,7 +75,7 @@ export class SequencerActions {
 
       }, this.ngRedux.getState().sequencer.get('bpm'), fromPosition);
 
-    progress.subscribe(elapsedBeats => {
+    playingContext.progress.subscribe(elapsedBeats => {
       if (elapsedBeats >=
         this.ngRedux.getState().sequencer.get('sequenceLength')) {
           this.stop();
@@ -86,14 +86,12 @@ export class SequencerActions {
     });
 
     // update redux state every 500ms with the current position
-    progress.throttleTime(200).subscribe(this.trackCurrentPosition.bind(this));
+    playingContext.progress.throttleTime(200).subscribe(
+      this.trackCurrentPosition.bind(this));
 
     this.ngRedux.dispatch({
       type: SequencerActions.PLAY,
-      payload: {
-        stop,
-        progress,
-      }
+      payload: playingContext,
     });
   }
 
@@ -103,10 +101,14 @@ export class SequencerActions {
 
   stop() {
     const playing = this.ngRedux.getState().sequencer.get('playing');
+    const sequenceLength = this.ngRedux.getState().sequencer.get('sequenceLength');
     if (playing) {
+      this.ngRedux.dispatch({
+        type: SequencerActions.STOP,
+        position: playing.currentPosition() >
+          sequenceLength ? 0 : playing.currentPosition(),
+      });
       playing.stop();
-      this.trackCurrentPosition(0);
-      this.ngRedux.dispatch({ type: SequencerActions.STOP });
     }
   }
 
