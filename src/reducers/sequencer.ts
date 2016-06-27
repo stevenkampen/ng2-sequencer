@@ -202,12 +202,12 @@ const DUMMY_SEQUENCE_DATA_COMPILED = DUMMY_SEQUENCE_DATA
   }))
   .sortBy((sound: any) => sound.time);
 
-const DUMMY_TRACK_LENGTH = DUMMY_SEQUENCE_DATA_COMPILED
-  .reduce((r: number, value, i: number) => {
-    const nextValue = Math.max(r, value.time);
-    const end = i === DUMMY_SEQUENCE_DATA_COMPILED.size - 1;
-    return end ? Math.ceil(nextValue / 2) * 2 + 0.25 : nextValue;
-  }, 0);
+const lastBeat = DUMMY_SEQUENCE_DATA_COMPILED.getIn(
+  [DUMMY_SEQUENCE_DATA_COMPILED.size - 1]);
+
+const DUMMY_TRACK_LENGTH = Math.ceil(lastBeat.time + 1);
+
+console.log(DUMMY_SEQUENCE_DATA_COMPILED.getIn([DUMMY_SEQUENCE_DATA_COMPILED.size - 1]));
 
 const INITIAL_STATE = fromJS({
   looping: false,
