@@ -30,5 +30,5 @@ bootstrap(RioSampleApp, [
   SoundService,
   HTTP_PROVIDERS,
   ROUTER_PROVIDERS,
-  provide(APP_BASE_HREF, { useValue: '/' })
+  provide(APP_BASE_HREF, { useValue: '/ng2-sequencer' })
 ]);
