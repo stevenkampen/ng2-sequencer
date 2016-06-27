@@ -4,35 +4,144 @@ import { List, Map, fromJS } from 'immutable';
 const DUMMY_TEMPO = 120;
 
 const DUMMY_SEQUENCE_DATA = List([
+  [{
+    time: 0.75,
+    data: {},
+  }],
+  [{
+    time: 1.75,
+    data: {},
+  }],
+  [{
+    time: 2.75,
+    data: {},
+  }],
   [],
+  [
+    { time: 0.75, data: {} },
+    { time: 3.75, data: {} },
+  ],
+  [{
+    time: 1.75,
+    data: {},
+  }],
+  [{
+    time: 2.75,
+    data: {},
+  }],
+  [
+    { time: 0.75, data: {} },
+    { time: 3.75, data: {} },
+  ],
+  [{
+    time: 1.75,
+    data: {},
+  }],
+  [{
+    time: 2.75,
+    data: {},
+  }],
+  [],
+  [
+    { time: 3.75, data: {} },
+  ],
+  [{
+    time: 0.25,
+    data: {},
+  }],
+  [{
+    time: 1.25,
+    data: {},
+  }],
+  [{
+    time: 2.25,
+    data: {},
+  }],
+  [],
+  [
+    { time: 0.25, data: {} },
+    { time: 3.25, data: {} },
+  ],
+  [{
+    time: 1.25,
+    data: {},
+  }],
+  [{
+    time: 2.25,
+    data: {},
+  }],
+  [
+    { time: 0.25, data: {} },
+    { time: 3.25, data: {} },
+  ],
+  [{
+    time: 1.25,
+    data: {},
+  }],
+  [{
+    time: 2.25,
+    data: {},
+  }],
+  [],
+  [
+    { time: 3.25, data: {} },
+  ],
   [{
     time: 0.50,
-    data: {
-      susPercent: 0.5,
-    },
+    data: {},
   }],
-  [],
-  [],
-  [],
-  [],
-  [],
-  [],
-  [],
-  [],
-  [],
-  [],
-  [],
-  [],
-  [],
   [{
     time: 1.50,
-    data: {
-      susPercent: 0.3,
-    },
+    data: {},
   }],
+  [{
+    time: 2.50,
+    data: {},
+  }],
+  [],
+  [
+    { time: 0.50, data: {} },
+    { time: 3.50, data: {} },
+  ],
+  [{
+    time: 1.50,
+    data: {},
+  }],
+  [{
+    time: 2.50,
+    data: {},
+  }],
+  [
+    { time: 0.50, data: {} },
+    { time: 3.50, data: {} },
+  ],
+  [{
+    time: 1.50,
+    data: {},
+  }],
+  [{
+    time: 2.50,
+    data: {},
+  }],
+  [],
+  [
+    { time: 3.50, data: {} },
+  ],
 ]);
 
 const NOTES_DATA = fromJS([
+  { header: 'C', data: { note: 48 }},
+  { header: 'C#', data: { note: 49 }},
+  { header: 'D', data: { note: 50 }},
+  { header: 'D#', data: { note: 51 }},
+  { header: 'E', data: { note: 52 }},
+  { header: 'F', data: { note: 53 }},
+  { header: 'F#', data: { note: 54 }},
+  { header: 'G', data: { note: 55 }},
+  { header: 'G#', data: { note: 56 }},
+  { header: 'A', data: { note: 57 }},
+  { header: 'A#', data: { note: 58 }},
+  { header: 'B', data: { note: 59 }}, 
   { header: 'C', data: { note: 60 }},
   { header: 'C#', data: { note: 61 }},
   { header: 'D', data: { note: 62 }},
