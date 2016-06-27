@@ -79,7 +79,11 @@ export class SoundService {
     const stop = () => {
       // console.info('stop');
       gain.amp(0, 0.1);
-      setTimeout(() => gain.disconnect(), 100);
+      setTimeout(() => {
+        gain.disconnect();
+        gain.dispose();
+      }, 100);
+
       stopped = true;
     };
 

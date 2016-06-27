@@ -61,6 +61,10 @@ export function playSound(sound: SoundContext) {
       osc.start(sound.time);
       osc.freq(sound.p5.midiToFreq(midiOptions.note));
       env.play(osc, sound.time);
+      setTimeout(() => {
+        env.dispose();
+        osc.dispose();
+      }, sound.time + 10000); // TODO: Improve this timeout
       break;
 
     default:
