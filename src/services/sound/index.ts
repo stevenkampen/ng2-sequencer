@@ -64,6 +64,10 @@ export class SoundService {
     });
   }
 
+  public setAmplitude(amplitude) {
+    this.mainGainNode.amp(amplitude, 0.1);
+  }
+
   public playSequence(
     getNextSoundsAfterBeat: (lastScheduledBeat) => any,
     bpm: number = 120,

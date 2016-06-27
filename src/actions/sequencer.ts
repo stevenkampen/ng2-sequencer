@@ -19,11 +19,15 @@ export class SequencerActions {
   static REMOVE_CHANNEL = 'REMOVE_CHANNEL';
   static TOGGLE_LOOPING = 'TOGGLE_LOOPING';
   static UPDATE_CURRENT_POSITION = 'UPDATE_CURRENT_POSITION';
+  static UPDATE_AMPLITUDE = 'UPDATE_AMPLITUDE';
 
   constructor(private ngRedux: NgRedux<IAppState>,
               private soundService: SoundService) {}
 
   play() {
+    this.soundService.setAmplitude(
+      this.ngRedux.getState().sequencer.get('amplitude'));
+
     const currentPosition = 
       this.ngRedux.getState().sequencer.get('currentPosition');
 
@@ -99,7 +103,17 @@ export class SequencerActions {
   }
 
   playMidiNote(note: number) {
+    this.soundService.setAmplitude(
+      this.ngRedux.getState().sequencer.get('amplitude'));
     this.soundService.playNote(note);
+  }
+
+  updateAmplitude(amplitude: number) {
+    this.soundService.setAmplitude(amplitude);
+    this.ngRedux.dispatch({
+      type: SequencerActions.UPDATE_AMPLITUDE,
+      amplitude,
+    });
   }
 
   changePosition(delta) {

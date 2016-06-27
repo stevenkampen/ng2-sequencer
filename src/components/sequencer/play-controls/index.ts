@@ -35,6 +35,9 @@ import {
           [ngClass]="{'fa-spin': looping }">
         </i>
       </rio-button>
+      <input type="range" class="input-range"
+        [value]="amplitude * 100"
+        (input)="updateAmplitude($event.target.value / 100)">
     </div>
   `,
   encapsulation: ViewEncapsulation.Emulated,
@@ -55,6 +58,8 @@ export class PlayControls {
   @Input() stop: () => void;
   @Input() pause: () => void;
   @Input() sequenceLength: number;
+  @Input() amplitude: number;
+  @Input() updateAmplitude: (amplitude: number) => void;
   @Input() changePosition: (beats) => void;
   @Input() toggleLooping: () => void;
 

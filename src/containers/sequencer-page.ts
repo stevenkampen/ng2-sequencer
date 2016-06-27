@@ -52,7 +52,9 @@ import {
         [stop]="actions.stop.bind(actions)"
         [sequenceLength]="sequenceLength | async"
         [changePosition]="actions.changePosition.bind(actions)"
-        [toggleLooping]="actions.toggleLooping.bind(actions)">
+        [toggleLooping]="actions.toggleLooping.bind(actions)"
+        [amplitude]="amplitude | async"
+        [updateAmplitude]="actions.updateAmplitude.bind(actions)">
       </play-controls>
       <sequence-canvas class="flex-auto flex flex-column canvas-container"
         [channels]="channels | async"
@@ -91,6 +93,9 @@ export class SequencerPage {
 
   @select(n => n.sequencer.get('sequenceLength'))
   private sequenceLength: Observable<number>;
+
+  @select(n => n.sequencer.get('amplitude'))
+  private amplitude: Observable<number>;
 
   @select(n => n.sequencer.get('bpm'))
   private bpm: Observable<number>;

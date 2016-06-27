@@ -212,6 +212,7 @@ const DUMMY_TRACK_LENGTH = DUMMY_SEQUENCE_DATA_COMPILED
 const INITIAL_STATE = fromJS({
   looping: false,
   playing: null,
+  amplitude: 0.5,
   currentPosition: 0, // in beats
   bpm: DUMMY_TEMPO, // bpm
   channelHeaders: NOTES_DATA.map(v => v.get('header')),
@@ -241,6 +242,9 @@ export function sequencerReducer(
 
   case SequencerActions.UPDATE_CURRENT_POSITION:
       return state.update('currentPosition', (value) => action.position);
+
+  case SequencerActions.UPDATE_AMPLITUDE:
+      return state.update('amplitude', (value) => action.amplitude);
 
   case SequencerActions.ADD_CHANNEL:
     return state.update('channelCount', (value) => value + 1);
