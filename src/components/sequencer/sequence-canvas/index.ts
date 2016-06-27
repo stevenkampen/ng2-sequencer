@@ -20,6 +20,8 @@ import {
 import { Map } from 'immutable';
 import { Observable } from 'rxjs';
 
+const BEAT_WIDTH: number = 50;
+
 @Component({
   selector: 'sequence-canvas',
   template: `
@@ -37,8 +39,8 @@ import { Observable } from 'rxjs';
           <div *ngFor="let channel of channels; let odd = odd; let i = index;"
             class="channel"
             [ngClass]="{ odd: odd }">
-            <div *ngFor="let noteTiming of channelData.get(i)"
-              [style.left]="noteTiming.time * 100 + 'px'"
+            <div *ngFor="let sound of channelData.get(i)"
+              [style.left]="sound.time * ${BEAT_WIDTH} + 'px'"
               class="note">
             </div>
           </div>
@@ -61,10 +63,9 @@ import { Observable } from 'rxjs';
       overflow: hidden;
     }
     .sequence-board .channel {
-      height: 14px;
+      height: 20px;
       color: #CECECE;
       position: relative;
-      background-color: rgba(0, 0, 0, .3);
     }
     .sequence-panel .end-guide {
       position: absolute;
@@ -74,19 +75,35 @@ import { Observable } from 'rxjs';
       height: 100%;
     }
     .sequence-board .channel.odd {
-      background-color: rgba(0, 0, 0, .5);
+      background-color: rgba(255, 255, 255, .02);
     }
     .sequence-panel {
       position: relative;
+      background-color: #111;
+      background-image: -moz-repeating-linear-gradient(90deg, transparent, 
+        transparent ${BEAT_WIDTH - 2}px, #191919 ${BEAT_WIDTH}px, 
+        #191919 ${BEAT_WIDTH}px);
+      background-image: -webkit-repeating-linear-gradient(90deg, transparent, 
+        transparent ${BEAT_WIDTH - 2}px, #191919 ${BEAT_WIDTH}px, 
+        #191919 ${BEAT_WIDTH}px);
+      background-image: -o-repeating-linear-gradient(90deg, transparent,
+        transparent ${BEAT_WIDTH - 2}px, #191919 ${BEAT_WIDTH}px,
+        #191919 ${BEAT_WIDTH}px);
+      background-image: -ms-repeating-linear-gradient(90deg, transparent,
+        transparent ${BEAT_WIDTH - 2}px, #191919 ${BEAT_WIDTH}px,
+        #191919 ${BEAT_WIDTH}px);
+      background-image: repeating-linear-gradient(90deg, transparent,
+        transparent ${BEAT_WIDTH - 2}px, #222 ${BEAT_WIDTH}px,
+        #222 ${BEAT_WIDTH}px);
     }
     ul.channel-headers {
       width: 3em;  
       margin: 0;
     }
     ul.channel-headers li {
-      font-size: .6em;
+      font-size: .8em;
+      line-height: 20px;
       font-weight: bold;
-      height: 14px;
       background: #CECECE;
       padding: 0 .4em;
     }
@@ -95,12 +112,12 @@ import { Observable } from 'rxjs';
     }
     .note {
       position: absolute;
-      top: 3px;
-      margin-left: -4px;
-      height: 8px;
-      width: 8px;
+      top: 4px;
+      margin-left: -6px;
+      height: 12px;
+      width: 12px;
       background: red;
-      border-radius: 4px;
+      border-radius: 6px;
     }
     `,
   ],
@@ -122,7 +139,7 @@ export class SequenceCanvas implements OnChanges {
 
   private calcOffset(beatsElapsed: number) {
     const elapsedPercentage = beatsElapsed / this.sequenceLength;
-    const offset = this.sequenceLength * 50 * elapsedPercentage * 2;
+    const offset = this.sequenceLength * BEAT_WIDTH * elapsedPercentage;
     return offset;
   }
 
