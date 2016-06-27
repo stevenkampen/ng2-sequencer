@@ -13,8 +13,6 @@ import {
 export class SequencerActions {
   static STOP = 'STOP';
   static PLAY = 'PLAY';
-  static ADD_MEASURE = 'ADD_MEASURE';
-  static REMOVE_MEASURE = 'REMOVE_MEASURE';
   static ADD_CHANNEL = 'ADD_CHANNEL';
   static REMOVE_CHANNEL = 'REMOVE_CHANNEL';
   static TOGGLE_LOOPING = 'TOGGLE_LOOPING';
@@ -161,14 +159,6 @@ export class SequencerActions {
       type: SequencerActions.UPDATE_CURRENT_POSITION,
       position: position,
     });
-  }
-
-  addMeasure() {
-    this.ngRedux.dispatch({ type: SequencerActions.ADD_MEASURE });
-  }
-
-  removeMeasure() {
-    this.ngRedux.dispatch({ type: SequencerActions.REMOVE_MEASURE });
   }
 
   addChannel() {
