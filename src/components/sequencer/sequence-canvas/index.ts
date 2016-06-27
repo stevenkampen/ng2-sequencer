@@ -94,6 +94,7 @@ const BEAT_WIDTH: number = 50;
         #222 ${BEAT_WIDTH}px);
     }
     ul.channel-headers {
+      z-index: 1;
       width: 3em;  
       margin: 0;
     }
