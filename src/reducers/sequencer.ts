@@ -5,127 +5,127 @@ const DUMMY_TEMPO = 120;
 
 const DUMMY_SEQUENCE_DATA = List([
   [{
-    time: 0.75,
+    time: 1,
     data: {},
   }],
   [{
-    time: 1.75,
+    time: 2,
     data: {},
   }],
   [{
-    time: 2.75,
+    time: 3,
     data: {},
   }],
   [],
   [
-    { time: 0.75, data: {} },
-    { time: 3.75, data: {} },
+    { time: 1, data: {} },
+    { time: 4, data: {} },
   ],
   [{
-    time: 1.75,
+    time: 2,
     data: {},
   }],
   [{
-    time: 2.75,
+    time: 3,
     data: {},
   }],
   [
-    { time: 0.75, data: {} },
-    { time: 3.75, data: {} },
+    { time: 1, data: {} },
+    { time: 4, data: {} },
   ],
   [{
-    time: 1.75,
+    time: 2,
     data: {},
   }],
   [{
-    time: 2.75,
+    time: 3,
     data: {},
   }],
   [],
   [
-    { time: 3.75, data: {} },
+    { time: 4, data: {} },
   ],
   [{
-    time: 0.25,
+    time: 5,
     data: {},
   }],
   [{
-    time: 1.25,
+    time: 6,
     data: {},
   }],
   [{
-    time: 2.25,
+    time: 7,
     data: {},
   }],
   [],
   [
-    { time: 0.25, data: {} },
-    { time: 3.25, data: {} },
+    { time: 5, data: {} },
+    { time: 8, data: {} },
   ],
   [{
-    time: 1.25,
+    time: 6,
     data: {},
   }],
   [{
-    time: 2.25,
+    time: 7,
     data: {},
   }],
   [
-    { time: 0.25, data: {} },
-    { time: 3.25, data: {} },
+    { time: 5, data: {} },
+    { time: 8, data: {} },
   ],
   [{
-    time: 1.25,
+    time: 6,
     data: {},
   }],
   [{
-    time: 2.25,
+    time: 7,
     data: {},
   }],
   [],
   [
-    { time: 3.25, data: {} },
+    { time: 8, data: {} },
   ],
   [{
-    time: 0.50,
+    time: 9,
     data: {},
   }],
   [{
-    time: 1.50,
+    time: 10,
     data: {},
   }],
   [{
-    time: 2.50,
+    time: 11,
     data: {},
   }],
   [],
   [
-    { time: 0.50, data: {} },
-    { time: 3.50, data: {} },
+    { time: 12, data: {} },
+    { time: 9, data: {} },
   ],
   [{
-    time: 1.50,
+    time: 10,
     data: {},
   }],
   [{
-    time: 2.50,
+    time: 11,
     data: {},
   }],
   [
-    { time: 0.50, data: {} },
-    { time: 3.50, data: {} },
+    { time: 12, data: {} },
+    { time: 9, data: {} },
   ],
   [{
-    time: 1.50,
+    time: 10,
     data: {},
   }],
   [{
-    time: 2.50,
+    time: 11,
     data: {},
   }],
   [],
   [
-    { time: 3.50, data: {} },
+    { time: 12, data: {} },
   ],
 ]);
 
@@ -202,10 +202,8 @@ const DUMMY_SEQUENCE_DATA_COMPILED = DUMMY_SEQUENCE_DATA
   }))
   .sortBy((sound: any) => sound.time);
 
-const lastBeat = DUMMY_SEQUENCE_DATA_COMPILED.getIn(
-  [DUMMY_SEQUENCE_DATA_COMPILED.size - 1]);
-
-const DUMMY_TRACK_LENGTH = Math.ceil(lastBeat.time + 1);
+const DUMMY_TRACK_LENGTH = Math.ceil(DUMMY_SEQUENCE_DATA_COMPILED.getIn(
+  [DUMMY_SEQUENCE_DATA_COMPILED.size - 1]).time + 1);
 
 console.log(DUMMY_SEQUENCE_DATA_COMPILED.getIn([DUMMY_SEQUENCE_DATA_COMPILED.size - 1]));
 
