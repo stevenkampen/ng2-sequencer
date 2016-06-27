@@ -18,21 +18,19 @@ import {
         </i>
       </rio-button>
       <rio-button (click)="playing ? pause() : play()">
-        <i class="fa"
-          [ngClass]="{'fa-pause': playing, 'fa-play': !playing }">
+        <i class="fa" [ngClass]="{'fa-pause': playing, 'fa-play': !playing }">
         </i>
       </rio-button>
       <rio-button (click)="changePosition(2)">
         <i class="fa fa-step-forward">
         </i>
       </rio-button>
-      <rio-button (click)="playing ? stop() : null" [disabled]="!playing">
+      <rio-button (click)="stop()" [disabled]="currentPosition === 0">
         <i class="fa fa-stop">
         </i>
       </rio-button>
       <rio-button (click)="toggleLooping()">
-        <i class="fa fa-refresh"
-          [ngClass]="{'fa-spin': looping }">
+        <i class="fa fa-refresh" [ngClass]="{'fa-spin': looping }">
         </i>
       </rio-button>
       <input type="range" class="input-range"
@@ -61,6 +59,7 @@ export class PlayControls {
   @Input() amplitude: number;
   @Input() updateAmplitude: (amplitude: number) => void;
   @Input() changePosition: (beats) => void;
+  @Input() currentPosition: number;
   @Input() toggleLooping: () => void;
 
   constructor() {

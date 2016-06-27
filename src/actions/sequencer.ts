@@ -142,14 +142,17 @@ export class SequencerActions {
     const playing = this.ngRedux.getState().sequencer.get('playing');
     const sequenceLength = this.ngRedux.getState().sequencer.get('sequenceLength');
 
+    const lastBeatTime = !playing ? 
+      this.ngRedux.getState().sequencer.get('currentPosition') : 
+        playing.currentPosition() > sequenceLength ? 0 :
+        playing.currentPosition();
+
+    this.ngRedux.dispatch({
+      type: SequencerActions.STOP,
+      position: reset ? 0 : lastBeatTime,
+    });
+
     if (playing) {
-
-      this.ngRedux.dispatch({
-        type: SequencerActions.STOP,
-        position: reset || playing.currentPosition() >
-          sequenceLength ? 0 : playing.currentPosition(),
-      });
-
       playing.stop();
     }
   }

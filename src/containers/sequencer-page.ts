@@ -52,6 +52,7 @@ import {
         [stop]="actions.stop.bind(actions)"
         [sequenceLength]="sequenceLength | async"
         [changePosition]="actions.changePosition.bind(actions)"
+        [currentPosition]="currentPosition | async"
         [toggleLooping]="actions.toggleLooping.bind(actions)"
         [amplitude]="amplitude | async"
         [updateAmplitude]="actions.updateAmplitude.bind(actions)">
