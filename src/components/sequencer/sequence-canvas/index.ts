@@ -59,13 +59,13 @@ const BEAT_WIDTH: number = 50;
       width: 100%;
       overflow-y: auto;
     }
-    .sequence-board {
-      overflow: hidden;
-    }
-    .sequence-board .channel {
+    .sequence-panel .channel {
       height: 20px;
       color: #CECECE;
       position: relative;
+    }
+    .sequence-panel .channel.odd {
+      background-color: rgba(255, 255, 255, .02);
     }
     .sequence-panel .end-guide {
       position: absolute;
@@ -73,9 +73,6 @@ const BEAT_WIDTH: number = 50;
       width: 1px;
       background: red;
       height: 100%;
-    }
-    .sequence-board .channel.odd {
-      background-color: rgba(255, 255, 255, .02);
     }
     .sequence-panel {
       position: relative;
