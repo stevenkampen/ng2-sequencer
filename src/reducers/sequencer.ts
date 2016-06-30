@@ -1,9 +1,8 @@
 import { SequencerActions } from '../actions/sequencer';
 import { Map, fromJS } from 'immutable';
 
-const DUMMY_TEMPO = 120;
-
-const DUMMY_SEQUENCE_DATA = fromJS([
+// array of channels, which are arrays of sounds
+const INITIAL_SEQUENCE_DATA = fromJS([
   [
     { time: 1 },
   ],
@@ -171,45 +170,30 @@ const MIDI_NOTE_DATA = fromJS([
   { header: 'B', data: { note: 107 }},
 ]);
 
-const INITIAL_SOUND_MAPPING = {};
-
-let trackId = 0;
-
-// array of channels, which are arrays of sounds
-const INITIAL_SEQUENCE_DATA = DUMMY_SEQUENCE_DATA.map((channel, channelIndex) => {
-  return channel.map(value => {
-    trackId++;
-    INITIAL_SOUND_MAPPING[trackId] = value.setIn(['note'],
-      MIDI_NOTE_DATA.getIn([channelIndex, 'data', 'note']));
-    return value.setIn(['id'], trackId);
-  });
-});
-
 // single ordered array of all sounds
-const DUMMY_SEQUENCE_DATA_COMPILED = INITIAL_SEQUENCE_DATA
-  .flatMap(channel => channel.map(value => {
-    return fromJS({
-      id: value.get('id'),
-      time: value.get('time'),
-    });
+const INITIAL_SEQUENCE_DATA_COMPILED = INITIAL_SEQUENCE_DATA
+  .flatMap((channel, channelIndex) => channel.map(value => {
+    return value.set('note',
+      MIDI_NOTE_DATA.getIn([channelIndex, 'data', 'note']));
   }))
   .sortBy(sound => sound.get('time'));
 
-const DUMMY_TRACK_LENGTH = Math.ceil(DUMMY_SEQUENCE_DATA_COMPILED.getIn(
-  [DUMMY_SEQUENCE_DATA_COMPILED.size - 1]).get('time') + 1);
+const INITIAL_SEQUENCE_LENGTH = Math.ceil(INITIAL_SEQUENCE_DATA_COMPILED.getIn(
+  [INITIAL_SEQUENCE_DATA_COMPILED.size - 1]).get('time') + 1);
+
+const CHANNEL_HEADERS = MIDI_NOTE_DATA.map(v => v.get('header'));
 
 const INITIAL_STATE = fromJS({
   looping: false,
   playing: null,
   amplitude: 0.5,
   currentPosition: 0, // in beats
-  bpm: DUMMY_TEMPO, // bpm
-  channelHeaders: MIDI_NOTE_DATA.map(v => v.get('header')),
-  channelData: DUMMY_SEQUENCE_DATA,
-  compiledSequenceData: DUMMY_SEQUENCE_DATA_COMPILED,
-  sequenceLength: DUMMY_TRACK_LENGTH,
+  bpm: 120, // bpm
+  channelHeaders: CHANNEL_HEADERS,
+  channelData: INITIAL_SEQUENCE_DATA,
+  compiledSequenceData: INITIAL_SEQUENCE_DATA_COMPILED,
+  sequenceLength: INITIAL_SEQUENCE_LENGTH,
   channels: MIDI_NOTE_DATA,
-  soundMapping: INITIAL_SOUND_MAPPING,
   selectedSound: null,
 });
 

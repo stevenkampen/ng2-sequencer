@@ -37,9 +37,6 @@ export class SequencerActions {
         const sequenceData
           = this.ngRedux.getState().sequencer.get('compiledSequenceData');
 
-        const soundMapping =
-          this.ngRedux.getState().sequencer.get('soundMapping');
-
         // console.log('Looking for time:%s in items',
         //   lastScheduledBeat,
         //   sequenceData.toJS());
@@ -51,11 +48,8 @@ export class SequencerActions {
         const sounds = [];
 
         const addSound = (sound) => {
-          sounds.push(
-            sound.merge(soundMapping.get(String(sound.get('id'))))
-            .toJS());
+          sounds.push(sound.toJS());
         };
-
         while (true) {
           const valueAt = sequenceData.get(i);
           if (valueAt.get('time') <= lastScheduledBeat) {
@@ -69,8 +63,9 @@ export class SequencerActions {
             // console.log('i:', i);
           } else if (valueAt.get('time') > lastScheduledBeat
             && (i === 0 || sequenceData.get(i - 1).get('time') <= lastScheduledBeat)) {
-            // this is the sound we're looking for...
+            // this is the time value we're looking for... 
             addSound(valueAt);
+            // check for subsequent sounds with the same time value
             while (sequenceData.get(i + 1) && 
               sequenceData.get(i + 1).get('time') === valueAt.get('time')) {
               addSound(sequenceData.get(i + 1));
