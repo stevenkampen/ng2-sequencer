@@ -210,6 +210,7 @@ const INITIAL_STATE = fromJS({
   sequenceLength: DUMMY_TRACK_LENGTH,
   channels: NOTES_DATA,
   soundMapping: INITIAL_SOUND_MAPPING,
+  selectedSound: null,
 });
 
 export type ISequencer = Map<string, any>;
@@ -241,6 +242,9 @@ export function sequencerReducer(
 
   case SequencerActions.REMOVE_CHANNEL:
       return state.update('channelCount', (value) => value - 1);
+
+  case SequencerActions.SELECT_SOUND:
+    return state.update('selectedSound', (value) => action.sound);
 
   default:
     return state;

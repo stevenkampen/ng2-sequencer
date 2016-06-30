@@ -17,13 +17,13 @@ import {
   RioContainer,
   PlayControls,
   SequenceCanvas,
-  Keyboard,
+  SoundConfigPanel,
 } from '../components';
 
 @Component({
   selector: 'sequencer-page',
   providers: [SequencerActions],
-  directives: [RioContainer, PlayControls, SequenceCanvas, Keyboard],
+  directives: [RioContainer, PlayControls, SequenceCanvas, SoundConfigPanel],
   pipes: [AsyncPipe],
   encapsulation: ViewEncapsulation.Emulated,
   styles: [`
@@ -63,8 +63,13 @@ import {
         [currentPosition]="currentPosition | async"
         [playing]="playing | async"
         [sequenceLength]="sequenceLength | async"
-        [playMidiNote]="actions.playMidiNote.bind(actions)">
+        [playMidiNote]="actions.playMidiNote.bind(actions)"
+        [selectSound]="actions.selectSound.bind(actions)">
       </sequence-canvas>
+      <sound-config-panel
+        *ngIf="selectedSound | async"
+        [sound]="selectedSound | async">
+      </sound-config-panel>
     </div>
   `
 })
@@ -102,5 +107,8 @@ export class SequencerPage {
 
   @select(n => n.sequencer.get('currentPosition'))
   private currentPosition: Observable<number>;
+
+  @select(n => n.sequencer.get('selectedSound'))
+  private selectedSound: Observable<any>;
 
 }

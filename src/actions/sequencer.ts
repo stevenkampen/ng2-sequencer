@@ -185,4 +185,11 @@ export class SequencerActions {
   toggleLooping() {
     this.ngRedux.dispatch({ type: SequencerActions.TOGGLE_LOOPING });
   }
+
+  selectSound(sound: any) {
+    this.ngRedux.dispatch({
+      type: SequencerActions.SELECT_SOUND,
+      sound: sound,
+    });
+  }
 }
