@@ -1,4 +1,4 @@
-import { Injectable, provide } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import {
   Observable,
@@ -36,7 +36,7 @@ export class SoundService {
     this.mainGainNode.connect();
   }
 
-  public playNote(
+  public playMidiNote(
     note: number,
     time: number = 0,
     gainNode: any = this.mainGainNode,
@@ -98,7 +98,7 @@ export class SoundService {
     let beatsElapsed = beatOffset;
     let lastScheduledBeat = beatOffset;
 
-    let notes = getNextSoundsAfterBeat(lastScheduledBeat);
+    let sounds = getNextSoundsAfterBeat(lastScheduledBeat);
 
     const beatsToSecondsFactor = bpm / 60;
 
@@ -115,12 +115,12 @@ export class SoundService {
             progress.next(beatsElapsed);
           }
 
-          while (notes.length && lastScheduledBeat < beatsElapsed
+          while (sounds.length && lastScheduledBeat < beatsElapsed
             + 0.2 * beatsToSecondsFactor) {
 
             // queue this batch of sounds
-            notes.map(note => {
-              const noteBeatOffset = note.time - beatsElapsed;
+            sounds.map(sound => {
+              const noteBeatOffset = sound.time - beatsElapsed;
               if (noteBeatOffset > 0) {
                 const timeOffset = noteBeatOffset / beatsToSecondsFactor;
                 playSound({
@@ -128,14 +128,14 @@ export class SoundService {
                   type: SoundType.MIDI_OSC,
                   gain: gain,
                   p5: this.p5,
-                  data: note,
+                  data: sound,
                 });
               }
             });
 
             // progress to the next beat position
-            lastScheduledBeat = notes[0].time;
-            notes = getNextSoundsAfterBeat(lastScheduledBeat);
+            lastScheduledBeat = sounds[0].time;
+            sounds = getNextSoundsAfterBeat(lastScheduledBeat);
 
           }
 

@@ -108,7 +108,7 @@ const DUMMY_SEQUENCE_DATA = fromJS([
   ],
 ]);
 
-const NOTES_DATA = fromJS([
+const MIDI_NOTE_DATA = fromJS([
   { header: 'C', data: { note: 48 }},
   { header: 'C#', data: { note: 49 }},
   { header: 'D', data: { note: 50 }},
@@ -180,7 +180,7 @@ const INITIAL_SEQUENCE_DATA = DUMMY_SEQUENCE_DATA.map((channel, channelIndex) =>
   return channel.map(value => {
     trackId++;
     INITIAL_SOUND_MAPPING[trackId] = value.setIn(['note'],
-      NOTES_DATA.getIn([channelIndex, 'data', 'note']));
+      MIDI_NOTE_DATA.getIn([channelIndex, 'data', 'note']));
     return value.setIn(['id'], trackId);
   });
 });
@@ -204,11 +204,11 @@ const INITIAL_STATE = fromJS({
   amplitude: 0.5,
   currentPosition: 0, // in beats
   bpm: DUMMY_TEMPO, // bpm
-  channelHeaders: NOTES_DATA.map(v => v.get('header')),
+  channelHeaders: MIDI_NOTE_DATA.map(v => v.get('header')),
   channelData: DUMMY_SEQUENCE_DATA,
   compiledSequenceData: DUMMY_SEQUENCE_DATA_COMPILED,
   sequenceLength: DUMMY_TRACK_LENGTH,
-  channels: NOTES_DATA,
+  channels: MIDI_NOTE_DATA,
   soundMapping: INITIAL_SOUND_MAPPING,
   selectedSound: null,
 });

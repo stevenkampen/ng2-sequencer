@@ -48,11 +48,11 @@ export class SequencerActions {
         let searchRangeEnd = sequenceData.size - 1;
         let i = Math.floor(searchRangeStart + searchRangeEnd / 2);
         // console.log('i:', i);
-        const notes = [];
+        const sounds = [];
 
-        const addNote = (note) => {
-          notes.push(
-            note.merge(soundMapping.get(String(note.get('id'))))
+        const addSound = (sound) => {
+          sounds.push(
+            sound.merge(soundMapping.get(String(sound.get('id'))))
             .toJS());
         };
 
@@ -62,32 +62,32 @@ export class SequencerActions {
             if (i === sequenceData.size - 1) {
               break;
             }
-            // this note is earlier than our current beat
+            // this sound is earlier than our current beat
             searchRangeStart = i + 1;
             i = Math.floor(searchRangeStart +
               (searchRangeEnd - searchRangeStart) / 2);
             // console.log('i:', i);
           } else if (valueAt.get('time') > lastScheduledBeat
             && (i === 0 || sequenceData.get(i - 1).get('time') <= lastScheduledBeat)) {
-            // this is the note we're looking for...
-            addNote(valueAt);
+            // this is the sound we're looking for...
+            addSound(valueAt);
             while (sequenceData.get(i + 1) && 
               sequenceData.get(i + 1).get('time') === valueAt.get('time')) {
-              addNote(sequenceData.get(i + 1));
+              addSound(sequenceData.get(i + 1));
               i++;
             }
             break;
           } else if (valueAt.get('time') > lastScheduledBeat) {
-            // this note is later than our current beat
+            // this sound is later than our current beat
             searchRangeEnd = i - 1;
             i = Math.floor(searchRangeStart +
               (searchRangeEnd - searchRangeStart) / 2);
             // console.log('i:', i);
           }
         }
-        // console.debug('notes', notes);
+        // console.debug('sounds', sounds);
         // console.timeEnd('findNote');
-        return notes;
+        return sounds;
 
       }, this.ngRedux.getState().sequencer.get('bpm'), currentPosition);
 
@@ -114,7 +114,7 @@ export class SequencerActions {
   playMidiNote(note: number) {
     this.soundService.setAmplitude(
       this.ngRedux.getState().sequencer.get('amplitude'));
-    this.soundService.playNote(note);
+    this.soundService.playMidiNote(note);
   }
 
   updateAmplitude(amplitude: number) {
