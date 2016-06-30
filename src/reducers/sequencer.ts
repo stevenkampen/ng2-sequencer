@@ -1,131 +1,110 @@
 import { SequencerActions } from '../actions/sequencer';
-import { List, Map, fromJS } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 const DUMMY_TEMPO = 120;
 
-const DUMMY_SEQUENCE_DATA = List([
-  [{
-    time: 1,
-    data: {},
-  }],
-  [{
-    time: 2,
-    data: {},
-  }],
-  [{
-    time: 3,
-    data: {},
-  }],
+const DUMMY_SEQUENCE_DATA = fromJS([
+  [
+    { time: 1 },
+  ],
+  [
+    { time: 2 },
+  ],
+  [
+    { time: 3 },
+  ],
   [],
   [
-    { time: 1, data: {} },
-    { time: 4, data: {} },
+    { time: 1 },
+    { time: 4 },
   ],
-  [{
-    time: 2,
-    data: {},
-  }],
-  [{
-    time: 3,
-    data: {},
-  }],
   [
-    { time: 1, data: {} },
-    { time: 4, data: {} },
+    { time: 2 },
   ],
-  [{
-    time: 2,
-    data: {},
-  }],
-  [{
-    time: 3,
-    data: {},
-  }],
+  [
+    { time: 3 },
+  ],
+  [
+    { time: 1 },
+    { time: 4 },
+  ],
+  [
+    { time: 2 },
+  ],
+  [
+    { time: 3 },
+  ],
   [],
   [
-    { time: 4, data: {} },
+    { time: 4 },
   ],
-  [{
-    time: 5,
-    data: {},
-  }],
-  [{
-    time: 6,
-    data: {},
-  }],
-  [{
-    time: 7,
-    data: {},
-  }],
+  [
+    { time: 5 },
+  ],
+  [
+    { time: 6 },
+  ],
+  [
+    { time: 7 },
+  ],
   [],
   [
-    { time: 5, data: {} },
-    { time: 8, data: {} },
+    { time: 5 },
+    { time: 8 },
   ],
-  [{
-    time: 6,
-    data: {},
-  }],
-  [{
-    time: 7,
-    data: {},
-  }],
   [
-    { time: 5, data: {} },
-    { time: 8, data: {} },
+    { time: 6 },
   ],
-  [{
-    time: 6,
-    data: {},
-  }],
-  [{
-    time: 7,
-    data: {},
-  }],
+  [
+    { time: 7 },
+  ],
+  [
+    { time: 5 },
+    { time: 8 },
+  ],
+  [
+    { time: 6 },
+  ],
+  [
+    { time: 7 },
+  ],
   [],
   [
-    { time: 8, data: {} },
+    { time: 8 },
   ],
-  [{
-    time: 9,
-    data: {},
-  }],
-  [{
-    time: 10,
-    data: {},
-  }],
-  [{
-    time: 11,
-    data: {},
-  }],
+  [
+    { time: 9 },
+  ],
+  [
+    { time: 10 },
+  ],
+  [
+    { time: 11 },
+  ],
   [],
   [
-    { time: 12, data: {} },
-    { time: 9, data: {} },
+    { time: 12 },
+    { time: 9 },
   ],
-  [{
-    time: 10,
-    data: {},
-  }],
-  [{
-    time: 11,
-    data: {},
-  }],
   [
-    { time: 12, data: {} },
-    { time: 9, data: {} },
+    { time: 10 },
   ],
-  [{
-    time: 10,
-    data: {},
-  }],
-  [{
-    time: 11,
-    data: {},
-  }],
+  [
+    { time: 11 },
+  ],
+  [
+    { time: 12 },
+    { time: 9 },
+  ],
+  [
+    { time: 10 },
+  ],
+  [
+    { time: 11 },
+  ],
   [],
   [
-    { time: 12, data: {} },
+    { time: 12 },
   ],
 ]);
 
@@ -192,20 +171,32 @@ const NOTES_DATA = fromJS([
   { header: 'B', data: { note: 107 }},
 ]);
 
-const DUMMY_SEQUENCE_DATA_COMPILED = DUMMY_SEQUENCE_DATA
-  .flatMap((value, i) => value.map(nodeValue => {
-    return {
-      data: Object.assign({ note: NOTES_DATA.getIn([i, 'data', 'note']) },
-        nodeValue.data),
-      time: nodeValue.time,
-    };
+const INITIAL_SOUND_MAPPING = {};
+
+let trackId = 0;
+
+// array of channels, which are arrays of sounds
+const INITIAL_SEQUENCE_DATA = DUMMY_SEQUENCE_DATA.map((channel, channelIndex) => {
+  return channel.map(value => {
+    trackId++;
+    INITIAL_SOUND_MAPPING[trackId] = value.setIn(['note'],
+      NOTES_DATA.getIn([channelIndex, 'data', 'note']));
+    return value.setIn(['id'], trackId);
+  });
+});
+
+// single ordered array of all sounds
+const DUMMY_SEQUENCE_DATA_COMPILED = INITIAL_SEQUENCE_DATA
+  .flatMap(channel => channel.map(value => {
+    return fromJS({
+      id: value.get('id'),
+      time: value.get('time'),
+    });
   }))
-  .sortBy((sound: any) => sound.time);
+  .sortBy(sound => sound.get('time'));
 
 const DUMMY_TRACK_LENGTH = Math.ceil(DUMMY_SEQUENCE_DATA_COMPILED.getIn(
-  [DUMMY_SEQUENCE_DATA_COMPILED.size - 1]).time + 1);
-
-console.log(DUMMY_SEQUENCE_DATA_COMPILED.getIn([DUMMY_SEQUENCE_DATA_COMPILED.size - 1]));
+  [DUMMY_SEQUENCE_DATA_COMPILED.size - 1]).get('time') + 1);
 
 const INITIAL_STATE = fromJS({
   looping: false,
@@ -218,6 +209,7 @@ const INITIAL_STATE = fromJS({
   compiledSequenceData: DUMMY_SEQUENCE_DATA_COMPILED,
   sequenceLength: DUMMY_TRACK_LENGTH,
   channels: NOTES_DATA,
+  soundMapping: INITIAL_SOUND_MAPPING,
 });
 
 export type ISequencer = Map<string, any>;

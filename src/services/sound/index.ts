@@ -128,7 +128,7 @@ export class SoundService {
                   type: SoundType.MIDI_OSC,
                   gain: gain,
                   p5: this.p5,
-                  data: note.data,
+                  data: note,
                 });
               }
             });

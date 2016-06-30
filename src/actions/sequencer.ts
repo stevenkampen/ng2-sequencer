@@ -18,6 +18,7 @@ export class SequencerActions {
   static TOGGLE_LOOPING = 'TOGGLE_LOOPING';
   static UPDATE_CURRENT_POSITION = 'UPDATE_CURRENT_POSITION';
   static UPDATE_AMPLITUDE = 'UPDATE_AMPLITUDE';
+  static SELECT_SOUND = 'SELECT_SOUND';
 
   constructor(private ngRedux: NgRedux<IAppState>,
               private soundService: SoundService) {}
@@ -26,7 +27,7 @@ export class SequencerActions {
     this.soundService.setAmplitude(
       this.ngRedux.getState().sequencer.get('amplitude'));
 
-    const currentPosition = 
+    const currentPosition =
       this.ngRedux.getState().sequencer.get('currentPosition');
 
     const playingContext = this.soundService.playSequence(
@@ -35,6 +36,9 @@ export class SequencerActions {
 
         const sequenceData
           = this.ngRedux.getState().sequencer.get('compiledSequenceData');
+
+        const soundMapping =
+          this.ngRedux.getState().sequencer.get('soundMapping');
 
         // console.log('Looking for time:%s in items',
         //   lastScheduledBeat,
@@ -45,9 +49,16 @@ export class SequencerActions {
         let i = Math.floor(searchRangeStart + searchRangeEnd / 2);
         // console.log('i:', i);
         const notes = [];
+
+        const addNote = (note) => {
+          notes.push(
+            note.merge(soundMapping.get(String(note.get('id'))))
+            .toJS());
+        };
+
         while (true) {
           const valueAt = sequenceData.get(i);
-          if (valueAt.time <= lastScheduledBeat) {
+          if (valueAt.get('time') <= lastScheduledBeat) {
             if (i === sequenceData.size - 1) {
               break;
             }
@@ -56,17 +67,17 @@ export class SequencerActions {
             i = Math.floor(searchRangeStart +
               (searchRangeEnd - searchRangeStart) / 2);
             // console.log('i:', i);
-          } else if (valueAt.time > lastScheduledBeat
-            && (i === 0 || sequenceData.get(i - 1).time <= lastScheduledBeat)) {
+          } else if (valueAt.get('time') > lastScheduledBeat
+            && (i === 0 || sequenceData.get(i - 1).get('time') <= lastScheduledBeat)) {
             // this is the note we're looking for...
-            notes.push(valueAt);
+            addNote(valueAt);
             while (sequenceData.get(i + 1) && 
-              sequenceData.get(i + 1).time === valueAt.time) {
-              notes.push(sequenceData.get(i + 1));
+              sequenceData.get(i + 1).get('time') === valueAt.get('time')) {
+              addNote(sequenceData.get(i + 1));
               i++;
             }
             break;
-          } else if (valueAt.time > lastScheduledBeat) {
+          } else if (valueAt.get('time') > lastScheduledBeat) {
             // this note is later than our current beat
             searchRangeEnd = i - 1;
             i = Math.floor(searchRangeStart +
@@ -115,7 +126,6 @@ export class SequencerActions {
   }
 
   changePosition(delta) {
-    console.log('Change Position by:', delta);
     const playing = this.ngRedux.getState().sequencer.get('playing');
     const sequenceLength = this.ngRedux.getState().sequencer.get('sequenceLength');
     const currentPosition = playing ? playing.currentPosition() :

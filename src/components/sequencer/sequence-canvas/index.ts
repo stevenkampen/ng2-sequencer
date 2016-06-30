@@ -40,7 +40,8 @@ const BEAT_WIDTH: number = 50;
             class="channel"
             [ngClass]="{ odd: odd }">
             <div *ngFor="let sound of channelData.get(i)"
-              [style.left]="sound.time * ${BEAT_WIDTH} + 'px'"
+            (click)="selectSound(sound)"
+              [style.left]="sound.get('time') * ${BEAT_WIDTH} + 'px'"
               class="note">
             </div>
           </div>
@@ -50,14 +51,27 @@ const BEAT_WIDTH: number = 50;
       </div>
     </div>
   `,
-  pipes: [ AsyncPipe ],
+  pipes: [AsyncPipe],
   directives: [NgStyle],
   encapsulation: ViewEncapsulation.Emulated,
   styles: [`
     .outer-wrapper {
-      height: 100%;
-      width: 100%;
       overflow-y: auto;
+    }
+    ul.channel-headers {
+      z-index: 1;
+      width: 3em;  
+      margin: 0;
+    }
+    ul.channel-headers li {
+      font-size: .8em;
+      line-height: 20px;
+      font-weight: bold;
+      background: #CECECE;
+      padding: 0 .4em;
+    }
+    ul.channel-headers li.odd {
+      background: #999;
     }
     .sequence-panel .channel {
       height: 20px;
@@ -93,21 +107,6 @@ const BEAT_WIDTH: number = 50;
         transparent ${BEAT_WIDTH - 2}px, #222 ${BEAT_WIDTH}px,
         #222 ${BEAT_WIDTH}px);
     }
-    ul.channel-headers {
-      z-index: 1;
-      width: 3em;  
-      margin: 0;
-    }
-    ul.channel-headers li {
-      font-size: .8em;
-      line-height: 20px;
-      font-weight: bold;
-      background: #CECECE;
-      padding: 0 .4em;
-    }
-    ul.channel-headers li.odd {
-      background: #999;
-    }
     .note {
       position: absolute;
       top: 4px;
@@ -130,6 +129,7 @@ export class SequenceCanvas implements OnChanges {
   @Input() sequenceLength: number;
   @Input() bpm: number;
   @Input() playMidiNote: (number) => void;
+  @Input() selectSound: (any) => void;
 
   @ViewChild('sequencePanel') elem: ElementRef;
 
