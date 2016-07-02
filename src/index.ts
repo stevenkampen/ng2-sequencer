@@ -35,6 +35,5 @@ bootstrap(RioSampleApp, [
   SoundService,
   SequenceService,
   HTTP_PROVIDERS,
-  provide(APP_BASE_HREF, { useValue: '' }),
   APP_ROUTER_PROVIDERS,
 ]);
