@@ -75,7 +75,7 @@ export class SequencerActions {
     const newPosition = currentPosition + delta;
 
     if (playing) {
-      this.stop();
+      this.stop(false);
     }
 
     this.updateCurrentPosition(newPosition >=
@@ -101,7 +101,7 @@ export class SequencerActions {
     });
 
     if (playing) {
-      playing.stop();
+      playing.stop(reset);
     }
   }
 

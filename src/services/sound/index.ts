@@ -80,7 +80,10 @@ export class SoundService {
     const progress = new Subject();
 
     let stopped = false;
-    const stop = () => {
+    const stop = (reset: boolean) => {
+      if (reset) {
+        progress.next(0);
+      }
       // console.info('stop');
       gain.amp(0, 0.1);
       setTimeout(() => {
