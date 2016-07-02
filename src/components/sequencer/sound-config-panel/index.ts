@@ -6,6 +6,8 @@ import {
   ViewChild,
 } from '@angular/core';
 
+import { RioButton } from '../../button';
+
 import {
   NgStyle,
   AsyncPipe,
@@ -21,10 +23,13 @@ import { Observable, Subject } from 'rxjs';
       <input class="input"
         [value]="sound.get('time')"
         (input)="timeUpdateSubject.next($event.target.value)" />
+      <rio-button [className]="'bg-red'" (click)="removeSound()">
+        <i class="fa fa-trash"></i>
+      </rio-button>
     </div>
   `,
   pipes: [],
-  directives: [NgStyle],
+  directives: [NgStyle, RioButton],
   encapsulation: ViewEncapsulation.Emulated,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,12 +37,14 @@ import { Observable, Subject } from 'rxjs';
 
 export class SoundConfigPanel {
   @Input() sound: any;
+  @Input() updateTime: (time: number) => void;
+  @Input() removeSound: () => void;
 
   private timeUpdateSubject: Subject<number> = new Subject<number>();
 
   constructor() {
-    this.timeUpdateSubject.debounceTime(750).subscribe(value => {
-      console.log('newtime:', value);
+    this.timeUpdateSubject.debounceTime(250).subscribe(value => {
+      this.updateTime(value);
     });
   }
 };

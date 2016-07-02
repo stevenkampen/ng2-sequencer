@@ -5,6 +5,7 @@ import {
   ViewEncapsulation,
   ElementRef,
   ViewChild,
+  HostListener,
 } from '@angular/core';
 
 import {
@@ -20,39 +21,44 @@ import {
 import { Map } from 'immutable';
 import { Observable } from 'rxjs';
 
+import { SoundBlip } from '../sound-blip/';
+
 const BEAT_WIDTH: number = 50;
 
 @Component({
   selector: 'sequence-canvas',
   template: `
-    <div class="flex outer-wrapper">
+    <div class="flex flex-auto outer-wrapper">
       <ul class="flex-none list-reset channel-headers">
         <li *ngFor="let channel of channels; let odd = odd"
-        (click)="playMidiNote(channel.get('data').get('note'))"
+          (click)="playMidiNote(channel.data.note)"
           [ngClass]="{ odd: odd }">
-          {{ channel.get('header') }}
+          {{ channel.header }}
         </li>
       </ul>
       <div class="sequence-board flex-auto">
         <div #sequencePanel class="sequence-panel"
           [ngStyle]="{'margin-left': '-' + calcOffset(currentPosition) + 'px'}">
-          <div *ngFor="let channel of channels; let odd = odd; let i = index;"
+          <div *ngFor="let channel of channels; let odd = odd; 
+            let channelIndex = index;"
+            (click)="handleChannelClick($event, channelIndex)"
             class="channel"
             [ngClass]="{ odd: odd }">
-            <div *ngFor="let sound of channelData.get(i)"
-            (click)="selectSound(sound)"
-              [style.left]="sound.get('time') * ${BEAT_WIDTH} + 'px'"
-              class="note">
-            </div>
+            <sound-blip *ngFor="let sound of channelData[channelIndex];
+                let soundIndex = index"
+              (click)="selectSound(channelIndex, soundIndex)"
+              [style.left]="sound.time * ${BEAT_WIDTH} + 'px'">
+            </sound-blip>
           </div>
           <div class="end-guide"
-            [style.left]="calcOffset(sequenceLength) + 'px'"></div>
+            [style.left]="calcOffset(sequenceLength) + 'px'">
+          </div>
         </div>
       </div>
     </div>
   `,
   pipes: [AsyncPipe],
-  directives: [NgStyle],
+  directives: [NgStyle, SoundBlip],
   encapsulation: ViewEncapsulation.Emulated,
   styles: [`
     .outer-wrapper {
@@ -107,14 +113,9 @@ const BEAT_WIDTH: number = 50;
         transparent ${BEAT_WIDTH - 2}px, #222 ${BEAT_WIDTH}px,
         #222 ${BEAT_WIDTH}px);
     }
-    .note {
+    sound-blip {
       position: absolute;
       top: 4px;
-      margin-left: -6px;
-      height: 12px;
-      width: 12px;
-      background: red;
-      border-radius: 6px;
     }
     `,
   ],
@@ -129,7 +130,8 @@ export class SequenceCanvas implements OnChanges {
   @Input() sequenceLength: number;
   @Input() bpm: number;
   @Input() playMidiNote: (number) => void;
-  @Input() selectSound: (any) => void;
+  @Input() selectSound: (channelIndex: number, soundIndex: number) => void;
+  @Input() addSound: (channelIndex: number, soundIndex: number) => void;
 
   @ViewChild('sequencePanel') elem: ElementRef;
 
@@ -139,6 +141,16 @@ export class SequenceCanvas implements OnChanges {
     const elapsedPercentage = beatsElapsed / this.sequenceLength;
     const offset = this.sequenceLength * BEAT_WIDTH * elapsedPercentage;
     return offset;
+  }
+
+  // onClick(channelIndex: number, soundIndex: number) {
+  //   console.log('HandleClick');
+  //   this.selectSound(channelIndex, soundIndex);
+  // }
+
+  handleChannelClick($event, channelIndex) {
+    this.addSound(channelIndex,
+      ($event.x - this.elem.nativeElement.offsetLeft) / 50);
   }
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {

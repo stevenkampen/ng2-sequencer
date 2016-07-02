@@ -3,7 +3,20 @@ import { Map, fromJS } from 'immutable';
 
 // array of channels, which are arrays of sounds
 const INITIAL_SEQUENCE_DATA = fromJS([
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
   [
+    { time: 0 },
     { time: 1 },
   ],
   [
@@ -170,16 +183,21 @@ const MIDI_NOTE_DATA = fromJS([
   { header: 'B', data: { note: 107 }},
 ]);
 
-// single ordered array of all sounds
-const INITIAL_SEQUENCE_DATA_COMPILED = INITIAL_SEQUENCE_DATA
-  .flatMap((channel, channelIndex) => channel.map(value => {
+const compileSequence = (channelData) => {
+  return channelData.flatMap((channel, channelIndex) => channel.map(value => {
     return value.set('note',
       MIDI_NOTE_DATA.getIn([channelIndex, 'data', 'note']));
   }))
   .sortBy(sound => sound.get('time'));
+};
 
-const INITIAL_SEQUENCE_LENGTH = Math.ceil(INITIAL_SEQUENCE_DATA_COMPILED.getIn(
-  [INITIAL_SEQUENCE_DATA_COMPILED.size - 1]).get('time') + 1);
+const resolveLength = (biggestTime) => Math.ceil(biggestTime + 1);
+
+// single ordered array of all sounds
+const INITIAL_SEQUENCE_DATA_COMPILED = compileSequence(INITIAL_SEQUENCE_DATA);
+
+const INITIAL_SEQUENCE_LENGTH = resolveLength(
+  INITIAL_SEQUENCE_DATA_COMPILED.last().get('time'));
 
 const CHANNEL_HEADERS = MIDI_NOTE_DATA.map(v => v.get('header'));
 
@@ -190,9 +208,14 @@ const INITIAL_STATE = fromJS({
   currentPosition: 0, // in beats
   bpm: 120, // bpm
   channelHeaders: CHANNEL_HEADERS,
-  channelData: INITIAL_SEQUENCE_DATA,
-  compiledSequenceData: INITIAL_SEQUENCE_DATA_COMPILED,
-  sequenceLength: INITIAL_SEQUENCE_LENGTH,
+  soundData: {
+    channelData: INITIAL_SEQUENCE_DATA,
+    compiledSequenceData: INITIAL_SEQUENCE_DATA_COMPILED,
+    sequenceLength: INITIAL_SEQUENCE_LENGTH,
+  },
+  // channelData: INITIAL_SEQUENCE_DATA,
+  // compiledSequenceData: INITIAL_SEQUENCE_DATA_COMPILED,
+  // sequenceLength: INITIAL_SEQUENCE_LENGTH,
   channels: MIDI_NOTE_DATA,
   selectedSound: null,
 });
@@ -215,6 +238,76 @@ export function sequencerReducer(
   case SequencerActions.TOGGLE_LOOPING:
     return state.update('looping', (value) => !value);
 
+    case SequencerActions.ADD_SOUND:
+      return state.update('soundData', (soundData) => {
+        let newSoundData = soundData
+          .updateIn(['channelData', action.channelIndex], (channel) => {
+            return channel.insert(action.newSoundIndex, fromJS(action.sound));
+          });
+
+        newSoundData = newSoundData.update('compiledSequenceData', () => {
+          return compileSequence(newSoundData.get('channelData'));
+        })
+        .update('sequenceLength', () => {
+          const previouslyHighestTime =
+            newSoundData.get('compiledSequenceData').last().get('time');
+          return resolveLength(Math.max(action.sound.time,
+            previouslyHighestTime));
+        });
+
+        return newSoundData;
+      });
+
+    case SequencerActions.UPDATE_SOUND_TIME:
+      return state.update('soundData', (soundData) => {
+        const sound = state.getIn(['soundData', 'channelData', 
+          action.channelIndex, action.soundIndex]);
+
+        let compiledSequence;
+
+        let newSoundData = soundData
+          .deleteIn(['channelData', action.channelIndex, action.soundIndex])
+          .updateIn(['channelData', action.channelIndex], (channel) => {
+            return channel.insert(action.newSoundIndex,
+              sound.update('time', () => action.time));
+          });
+
+        newSoundData = newSoundData.update('compiledSequenceData', () => {
+          compiledSequence = compileSequence(newSoundData.get('channelData'));
+          return compiledSequence;
+        })
+        .update('sequenceLength',
+          () => resolveLength(compiledSequence.last().get('time')));
+
+        return newSoundData;
+      });
+
+    case SequencerActions.REMOVE_SOUND:
+      return state.update('soundData', (soundData) => {
+
+        let compiledSequence;
+
+        let newSoundData = soundData
+          .deleteIn(['channelData', action.channelIndex, action.soundIndex]);
+
+        newSoundData = newSoundData.update('compiledSequenceData', () => {
+          compiledSequence = compileSequence(newSoundData.get('channelData'));
+          return compiledSequence;
+        })
+        .update('sequenceLength',
+          () => resolveLength(compiledSequence.last().get('time')));
+
+        return newSoundData;
+      })
+      .update('selectedSound', (selectedSound) => {
+        if (selectedSound &&
+          selectedSound.get(0) === action.channelIndex &&
+          selectedSound.get(1) === action.soundIndex) {
+          return null;
+        }
+        return selectedSound;
+      });
+
   case SequencerActions.UPDATE_CURRENT_POSITION:
       return state.update('currentPosition', (value) => action.position);
 
@@ -228,7 +321,8 @@ export function sequencerReducer(
       return state.update('channelCount', (value) => value - 1);
 
   case SequencerActions.SELECT_SOUND:
-    return state.update('selectedSound', (value) => action.sound);
+    return state.update('selectedSound', (value) =>
+      fromJS([action.channelIndex, action.soundIndex]));
 
   default:
     return state;

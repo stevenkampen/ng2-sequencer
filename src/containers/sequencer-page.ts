@@ -5,6 +5,7 @@ import {
   ViewEncapsulation,
   OnChanges,
   SimpleChange,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 
 import { AsyncPipe } from '@angular/common';
@@ -26,6 +27,7 @@ import {
   directives: [RioContainer, PlayControls, SequenceCanvas, SoundConfigPanel],
   pipes: [AsyncPipe],
   encapsulation: ViewEncapsulation.Emulated,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [`
   .sequencer-container {
     position: absolute;
@@ -56,7 +58,8 @@ import {
         [amplitude]="amplitude | async"
         [updateAmplitude]="actions.updateAmplitude.bind(actions)">
       </play-controls>
-      <sequence-canvas class="flex-auto flex flex-column canvas-container"
+      <sequence-canvas
+        class="flex-grow flex-auto flex flex-column canvas-container"
         [channels]="channels | async"
         [channelData]="channelData | async"
         [bpm]="bpm | async"
@@ -64,11 +67,14 @@ import {
         [playing]="playing | async"
         [sequenceLength]="sequenceLength | async"
         [playMidiNote]="actions.playMidiNote.bind(actions)"
-        [selectSound]="actions.selectSound.bind(actions)">
+        [selectSound]="actions.selectSound.bind(actions)"
+        [addSound]="actions.addSound.bind(actions)">
       </sequence-canvas>
-      <sound-config-panel
+      <sound-config-panel class="flex-none flex"
         *ngIf="selectedSound | async"
-        [sound]="selectedSound | async">
+        [sound]="selectedSound | async"
+        [updateTime]="actions.updateSelectedSoundTime.bind(actions)"
+        [removeSound]="actions.removeSelectedSound.bind(actions)">
       </sound-config-panel>
     </div>
   `
@@ -87,16 +93,17 @@ export class SequencerPage {
   @select(n => n.sequencer.get('looping'))
   private looping: Observable<boolean>;
 
-  @select(n => n.sequencer.get('channels'))
-  private channels: Observable<Array<any>>;
+  @select(n => n.sequencer.get('channels').toJS())
+  private channels: Observable<any[]>;
 
-  @select(n => n.sequencer.get('channelData'))
-  private channelData: Observable<any>;
+  @select(n => n.sequencer.getIn(['soundData', 'channelData']) ?
+    n.sequencer.getIn(['soundData', 'channelData']).toJS() : [])
+  private channelData: Observable<any[]>;
 
-  @select(n => n.sequencer.get('compiledSequenceData'))
-  private compiledSequenceData: Observable<any>;
+  @select(n => n.sequencer.getIn(['soundData', 'compiledSequenceData']))
+  private compiledSequenceData: Observable<any[]>;
 
-  @select(n => n.sequencer.get('sequenceLength'))
+  @select(n => n.sequencer.getIn(['soundData', 'sequenceLength']))
   private sequenceLength: Observable<number>;
 
   @select(n => n.sequencer.get('amplitude'))
@@ -108,7 +115,12 @@ export class SequencerPage {
   @select(n => n.sequencer.get('currentPosition'))
   private currentPosition: Observable<number>;
 
-  @select(n => n.sequencer.get('selectedSound'))
+  @select(n => n.sequencer.get('selectedSound') ? n.sequencer.getIn([
+      'soundData',
+      'channelData',
+      n.sequencer.getIn(['selectedSound', 0]),
+      n.sequencer.getIn(['selectedSound', 1]),
+    ]) : null)
   private selectedSound: Observable<any>;
 
 }

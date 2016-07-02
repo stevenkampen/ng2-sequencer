@@ -96,7 +96,7 @@ export class SoundService {
     };
 
     let beatsElapsed = beatOffset;
-    let lastScheduledBeat = beatOffset;
+    let lastScheduledBeat = beatOffset - 0.02;
 
     let sounds = getNextSoundsAfterBeat(lastScheduledBeat);
 

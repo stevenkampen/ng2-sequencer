@@ -1,7 +1,12 @@
 import { Injectable } from '@angular/core';
 import { NgRedux } from 'ng2-redux';
 import { IAppState } from '../reducers';
-import { SoundService } from '../services/sound';
+
+import {
+  SoundService,
+  SequenceService,
+} from '../services';
+
 import {
   Observable,
   Subscription,
@@ -19,76 +24,21 @@ export class SequencerActions {
   static UPDATE_CURRENT_POSITION = 'UPDATE_CURRENT_POSITION';
   static UPDATE_AMPLITUDE = 'UPDATE_AMPLITUDE';
   static SELECT_SOUND = 'SELECT_SOUND';
+  static REMOVE_SOUND = 'REMOVE_SOUND';
+  static UPDATE_SOUND_TIME = 'UPDATE_SOUND_TIME';
+  static ADD_SOUND = 'ADD_SOUND';
 
   constructor(private ngRedux: NgRedux<IAppState>,
-              private soundService: SoundService) {}
+              private soundService: SoundService,
+              private sequenceService: SequenceService) { }
 
   play() {
-    this.soundService.setAmplitude(
-      this.ngRedux.getState().sequencer.get('amplitude'));
-
-    const currentPosition =
-      this.ngRedux.getState().sequencer.get('currentPosition');
-
-    const playingContext = this.soundService.playSequence(
-      lastScheduledBeat => {
-        // console.time('findNote');
-
-        const sequenceData
-          = this.ngRedux.getState().sequencer.get('compiledSequenceData');
-
-        // console.log('Looking for time:%s in items',
-        //   lastScheduledBeat,
-        //   sequenceData.toJS());
-
-        let searchRangeStart = 0;
-        let searchRangeEnd = sequenceData.size - 1;
-        let i = Math.floor(searchRangeStart + searchRangeEnd / 2);
-        // console.log('i:', i);
-        const sounds = [];
-
-        const addSound = (sound) => {
-          sounds.push(sound.toJS());
-        };
-        while (true) {
-          const valueAt = sequenceData.get(i);
-          if (valueAt.get('time') <= lastScheduledBeat) {
-            if (i === sequenceData.size - 1) {
-              break;
-            }
-            // this sound is earlier than our current beat
-            searchRangeStart = i + 1;
-            i = Math.floor(searchRangeStart +
-              (searchRangeEnd - searchRangeStart) / 2);
-            // console.log('i:', i);
-          } else if (valueAt.get('time') > lastScheduledBeat
-            && (i === 0 || sequenceData.get(i - 1).get('time') <= lastScheduledBeat)) {
-            // this is the time value we're looking for... 
-            addSound(valueAt);
-            // check for subsequent sounds with the same time value
-            while (sequenceData.get(i + 1) && 
-              sequenceData.get(i + 1).get('time') === valueAt.get('time')) {
-              addSound(sequenceData.get(i + 1));
-              i++;
-            }
-            break;
-          } else if (valueAt.get('time') > lastScheduledBeat) {
-            // this sound is later than our current beat
-            searchRangeEnd = i - 1;
-            i = Math.floor(searchRangeStart +
-              (searchRangeEnd - searchRangeStart) / 2);
-            // console.log('i:', i);
-          }
-        }
-        // console.debug('sounds', sounds);
-        // console.timeEnd('findNote');
-        return sounds;
-
-      }, this.ngRedux.getState().sequencer.get('bpm'), currentPosition);
+    const playingContext =
+      this.sequenceService.playSequence(this.ngRedux.getState);
 
     playingContext.progress.subscribe(elapsedBeats => {
-      if (elapsedBeats >=
-        this.ngRedux.getState().sequencer.get('sequenceLength')) {
+      if (elapsedBeats >= this.ngRedux.getState().sequencer.getIn(
+        ['soundData', 'sequenceLength'])) {
           this.stop();
           if (this.ngRedux.getState().sequencer.get('looping')) {
             this.play();
@@ -122,7 +72,8 @@ export class SequencerActions {
 
   changePosition(delta) {
     const playing = this.ngRedux.getState().sequencer.get('playing');
-    const sequenceLength = this.ngRedux.getState().sequencer.get('sequenceLength');
+    const sequenceLength =
+      this.ngRedux.getState().sequencer.getIn(['soundData', 'sequenceLength']);
     const currentPosition = playing ? playing.currentPosition() :
       this.ngRedux.getState().sequencer.get('currentPosition');
     const newPosition = currentPosition + delta;
@@ -145,7 +96,8 @@ export class SequencerActions {
 
   stop(reset: boolean = true) {
     const playing = this.ngRedux.getState().sequencer.get('playing');
-    const sequenceLength = this.ngRedux.getState().sequencer.get('sequenceLength');
+    const sequenceLength =
+      this.ngRedux.getState().sequencer.getIn(['soundData', 'sequenceLength']);
 
     const lastBeatTime = !playing ? 
       this.ngRedux.getState().sequencer.get('currentPosition') : 
@@ -181,10 +133,71 @@ export class SequencerActions {
     this.ngRedux.dispatch({ type: SequencerActions.TOGGLE_LOOPING });
   }
 
-  selectSound(sound: any) {
+  selectSound(channelIndex: number, soundIndex: number) {
+    const selectedSound =
+      this.ngRedux.getState().sequencer.get('selectedSound');
+    if (!selectedSound ||
+      selectedSound.get(0) !== channelIndex ||
+      selectedSound.get(1) !== soundIndex) {
+      this.ngRedux.dispatch({
+        type: SequencerActions.SELECT_SOUND,
+        channelIndex,
+        soundIndex,
+      });
+    }
+  }
+
+  addSound(channelIndex: number, time: number, data: any = {}) {
+    const newSoundIndex =
+      this.sequenceService.findHighestIndexWithoutExceedingTime(time,
+        this.ngRedux.getState().sequencer.getIn(['soundData', 'channelData'])
+          .get(channelIndex)) + 1;
+
+    data.time = time;
+
     this.ngRedux.dispatch({
-      type: SequencerActions.SELECT_SOUND,
-      sound: sound,
+      type: SequencerActions.ADD_SOUND,
+      channelIndex,
+      newSoundIndex,
+      sound: data,
+    });
+  }
+
+  updateSelectedSoundTime(time: number) {
+    if (this.ngRedux.getState().sequencer.get('selectedSound')) {
+      const [channelIndex, soundIndex] = this.ngRedux.getState().sequencer
+        .get('selectedSound').toJS();
+
+      const newSoundIndex =
+        this.sequenceService.findHighestIndexWithoutExceedingTime(time,
+          this.ngRedux.getState().sequencer
+            .getIn(['soundData', 'channelData', channelIndex])
+            .delete(soundIndex)) + 1;
+
+      this.ngRedux.dispatch({
+        type: SequencerActions.UPDATE_SOUND_TIME,
+        channelIndex,
+        soundIndex,
+        time,
+        newSoundIndex,
+      });
+    }
+  }
+
+  removeSelectedSound() {
+    const selectedSound =
+      this.ngRedux.getState().sequencer.get('selectedSound');
+
+    if (selectedSound) {
+      this.removeSound(selectedSound.get(0), selectedSound.get(1));
+    }
+  }
+
+  removeSound(channelIndex: number, soundIndex: number) {
+    this.ngRedux.dispatch({
+      type: SequencerActions.REMOVE_SOUND,
+      channelIndex,
+      soundIndex,
     });
   }
 }

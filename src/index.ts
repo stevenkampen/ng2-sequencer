@@ -8,12 +8,17 @@ import 'ts-helpers';
 import { enableProdMode, provide } from '@angular/core';
 import { bootstrap } from '@angular/platform-browser-dynamic';
 import { HTTP_PROVIDERS } from '@angular/http';
-import { ROUTER_PROVIDERS } from '@angular/router-deprecated';
+
 import { APP_BASE_HREF } from '@angular/common/index';
 import { NgRedux } from 'ng2-redux';
+import { SequencerPage } from './containers/sequencer-page';
+import { APP_ROUTER_PROVIDERS } from './app.routes';
 
 import { RioSampleApp } from './containers/sample-app';
-import { SoundService } from './services/sound/';
+import {
+  SequenceService,
+  SoundService,
+} from './services';
 
 declare let __PRODUCTION__: any;
 
@@ -28,7 +33,8 @@ if (__PRODUCTION__) {
 bootstrap(RioSampleApp, [
   NgRedux,
   SoundService,
+  SequenceService,
   HTTP_PROVIDERS,
-  ROUTER_PROVIDERS,
-  provide(APP_BASE_HREF, { useValue: '/ng2-sequencer' })
+  provide(APP_BASE_HREF, { useValue: '' }),
+  APP_ROUTER_PROVIDERS,
 ]);
