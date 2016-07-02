@@ -228,15 +228,15 @@ export function sequencerReducer(
 
   switch (action.type) {
 
-  case SequencerActions.PLAY:
-    return state.update('playing', (value) => action.payload);
+    case SequencerActions.PLAY:
+      return state.update('playing', (value) => action.payload);
 
-  case SequencerActions.STOP:
-    return state.update('playing', (value) => null)
-                .update('currentPosition', (value) => action.position);
+    case SequencerActions.STOP:
+      return state.update('playing', (value) => null)
+                  .update('currentPosition', (value) => action.position);
 
-  case SequencerActions.TOGGLE_LOOPING:
-    return state.update('looping', (value) => !value);
+    case SequencerActions.TOGGLE_LOOPING:
+      return state.update('looping', (value) => !value);
 
     case SequencerActions.ADD_SOUND:
       return state.update('soundData', (soundData) => {
@@ -308,23 +308,23 @@ export function sequencerReducer(
         return selectedSound;
       });
 
-  case SequencerActions.UPDATE_CURRENT_POSITION:
+    case SequencerActions.UPDATE_CURRENT_POSITION:
       return state.update('currentPosition', (value) => action.position);
 
-  case SequencerActions.UPDATE_AMPLITUDE:
+    case SequencerActions.UPDATE_AMPLITUDE:
       return state.update('amplitude', (value) => action.amplitude);
 
-  case SequencerActions.ADD_CHANNEL:
-    return state.update('channelCount', (value) => value + 1);
+    case SequencerActions.ADD_CHANNEL:
+      return state.update('channelCount', (value) => value + 1);
 
-  case SequencerActions.REMOVE_CHANNEL:
+    case SequencerActions.REMOVE_CHANNEL:
       return state.update('channelCount', (value) => value - 1);
 
-  case SequencerActions.SELECT_SOUND:
-    return state.update('selectedSound', (value) =>
-      fromJS([action.channelIndex, action.soundIndex]));
+    case SequencerActions.SELECT_SOUND:
+      return state.update('selectedSound', (value) =>
+        fromJS([action.channelIndex, action.soundIndex]));
 
-  default:
-    return state;
-  }
+    default:
+      return state;
+    }
 }
