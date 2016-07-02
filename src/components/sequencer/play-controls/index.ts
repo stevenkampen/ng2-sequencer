@@ -25,7 +25,8 @@ import {
         <i class="fa fa-step-forward">
         </i>
       </rio-button>
-      <rio-button (click)="stop()" [disabled]="currentPosition === 0">
+      <rio-button (click)="stop()"
+        [disabled]="!playing && currentPosition === 0">
         <i class="fa fa-stop">
         </i>
       </rio-button>

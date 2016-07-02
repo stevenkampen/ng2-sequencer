@@ -46,10 +46,6 @@ export class SequencerActions {
         }
     });
 
-    // update redux state every 500ms with the current position
-    playingContext.progress.throttleTime(200).subscribe(
-      this.updateCurrentPosition.bind(this));
-
     this.ngRedux.dispatch({
       type: SequencerActions.PLAY,
       payload: playingContext,
@@ -99,14 +95,9 @@ export class SequencerActions {
     const sequenceLength =
       this.ngRedux.getState().sequencer.getIn(['soundData', 'sequenceLength']);
 
-    const lastBeatTime = !playing ? 
-      this.ngRedux.getState().sequencer.get('currentPosition') : 
-        playing.currentPosition() > sequenceLength ? 0 :
-        playing.currentPosition();
-
     this.ngRedux.dispatch({
       type: SequencerActions.STOP,
-      position: reset ? 0 : lastBeatTime,
+      position: reset ? 0 : playing.currentPosition(),
     });
 
     if (playing) {

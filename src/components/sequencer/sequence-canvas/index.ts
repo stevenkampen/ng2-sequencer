@@ -143,11 +143,6 @@ export class SequenceCanvas implements OnChanges {
     return offset;
   }
 
-  // onClick(channelIndex: number, soundIndex: number) {
-  //   console.log('HandleClick');
-  //   this.selectSound(channelIndex, soundIndex);
-  // }
-
   handleChannelClick($event, channelIndex) {
     this.addSound(channelIndex,
       ($event.x - this.elem.nativeElement.offsetLeft) / 50);
@@ -162,6 +157,8 @@ export class SequenceCanvas implements OnChanges {
         if (beatsElapsed < this.sequenceLength) {
           this.elem.nativeElement.style.marginLeft
             = `-${this.calcOffset(beatsElapsed)}px`;
+        } else {
+          this.elem.nativeElement.style.marginLeft = '0px';
         }
       });
     }
